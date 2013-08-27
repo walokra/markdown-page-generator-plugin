@@ -8,7 +8,29 @@
 	<packaging>maven-plugin</packaging>
 
 	<name>Markdown Page Generator Maven Plugin</name>
+	<description>Markdown to HTML Page Generator Maven Plugin</description> 
 	<url>http://ruleoftech.com/lab</url>
+
+	<licenses>
+		<license>
+			<name>MIT license</name>
+			<url>http://opensource.org/licenses/MIT</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	
+	<developers>
+		<developer>
+			<name>Marko Wallin</name>
+			<email>marko.wallink@iki.fi</email>
+		</developer>
+	</developers> 
+
+	<scm>
+		<url>git@github.com:walokra/markdown-page-generator-plugin.git</url>
+		<connection>scm:git:git@github.com:walokra/markdown-page-generator-plugin.git</connection>
+		<developerConnection>scm:git:git@github.com:walokra/markdown-page-generator-plugin.git</developerConnection>
+	</scm>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -57,6 +79,19 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.3.2</version>
 			</plugin>
 		</plugins>
 	</build>
