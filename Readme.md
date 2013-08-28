@@ -1,6 +1,6 @@
 # Markdown to HTML Page Generator Maven Plugin
 
-Plugin creates static HTML pages with Maven and Markdown. 
+Plugin creates static HTML pages with Maven and Markdown. Uses [pegdown](https://github.com/sirthias/pegdown) Markdown processor.
 
 You can configure the input and output directories and which files to copy. You can also include custom header and footer and general title. 
 

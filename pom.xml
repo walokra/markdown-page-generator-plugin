@@ -4,7 +4,7 @@
 
 	<groupId>com.ruleoftech</groupId>
 	<artifactId>markdown-page-generator-plugin</artifactId>
-	<version>0.1</version>
+	<version>0.2-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>Markdown Page Generator Maven Plugin</name>
@@ -55,9 +55,9 @@
 			<version>2.4</version>
 		</dependency>
 		<dependency>
-			<groupId>org.markdownj</groupId>
-			<artifactId>markdownj</artifactId>
-			<version>0.3.0-1.0.2b4</version>
+			<groupId>org.pegdown</groupId>
+			<artifactId>pegdown</artifactId>
+			<version>1.4.1</version>
 		</dependency>
 	</dependencies>
 

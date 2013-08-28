@@ -12,8 +12,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.util.StringUtils;
-
-import com.petebevin.markdown.MarkdownProcessor;
+import org.pegdown.PegDownProcessor;
 
 /**
  * Creates a static html from markdown files.
@@ -51,6 +50,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 	 * @throws MojoExecutionException
 	 *             Something went wrong
 	 */
+	@Override
 	public void execute() throws MojoExecutionException {
 		if (StringUtils.isNotEmpty(copyDirectories)) {
 			getLog().info("Copy files from directories");
@@ -130,7 +130,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				String markdown = FileUtils.readFileToString(dto.markdownFile);
 				// getLog().debug(markdown);
 
-				String markdownAsHtml = new MarkdownProcessor().markdown(markdown);
+				String markdownAsHtml = new PegDownProcessor().markdownToHtml(markdown);
 				StringBuilder data = new StringBuilder();
 				data.append(headerHtml);
 				data.append(markdownAsHtml);
