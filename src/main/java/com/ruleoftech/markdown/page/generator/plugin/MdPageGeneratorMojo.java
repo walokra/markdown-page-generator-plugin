@@ -2,7 +2,9 @@ package com.ruleoftech.markdown.page.generator.plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,6 +14,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.util.StringUtils;
+import org.pegdown.Extensions;
 import org.pegdown.PegDownProcessor;
 
 /**
@@ -35,6 +38,39 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
 	@Parameter(property = "generate.footerHtmlFile")
 	private String footerHtmlFile;
+
+	// Possible options
+	// SMARTS: Beautifies apostrophes, ellipses ("..." and ". . .") and dashes ("--" and "---")
+	// QUOTES: Beautifies single quotes, double quotes and double angle quotes (« and »)
+	// SMARTYPANTS: Convenience extension enabling both, SMARTS and QUOTES, at once.
+	// ABBREVIATIONS: Abbreviations in the way of PHP Markdown Extra.
+	// HARDWRAPS: Alternative handling of newlines, see Github-flavoured-Markdown
+	// AUTOLINKS: Plain (undelimited) autolinks the way Github-flavoured-Markdown implements them.
+	// TABLES: Tables similar to MultiMarkdown (which is in turn like the PHP Markdown Extra tables, but with colspan support).
+	// DEFINITION LISTS: Definition lists in the way of PHP Markdown Extra.
+	// FENCED CODE BLOCKS: Fenced Code Blocks in the way of PHP Markdown Extra or Github-flavoured-Markdown.
+	// HTML BLOCK SUPPRESSION: Suppresses the output of HTML blocks.
+	// INLINE HTML SUPPRESSION: Suppresses the output of inline HTML elements.
+	// WIKILINKS Support [[Wiki-style links]] with a customizable URL rendering logic.
+	@Parameter(property = "generate.pegdownExtensions", defaultValue = "TABLES")
+	private String pegdownExtensions;
+
+	private enum EPegdownExtensions {
+		NONE(0x00), SMARTS(0x01), QUOTES(0x02), SMARTYPANTS(EPegdownExtensions.SMARTS.getValue() + EPegdownExtensions.QUOTES.getValue()), ABBREVIATIONS(
+				0x04), HARDWRAPS(0x08), AUTOLINKS(0x10), TABLES(0x20), DEFINITIONS(0x40), FENCED_CODE_BLOCKS(0x80), WIKILINKS(0x100), ALL(
+				0x0000FFFF), SUPPRESS_HTML_BLOCKS(0x00010000), SUPPRESS_INLINE_HTML(0x00020000), SUPPRESS_ALL_HTML(0x00030000);
+
+		private final int value;
+
+		EPegdownExtensions(int value) {
+			this.value = value;
+		}
+
+		public int getValue() {
+			return value;
+		}
+
+	}
 
 	/**
 	 * Comma separated string of directories to be copied.
@@ -62,8 +98,32 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 		getLog().info("Read Markdown files from input directory");
 		readFiles();
 
+		getLog().info("Process Pegdown extension options");
+		int options = getPegdownExtensions(pegdownExtensions);
+
 		getLog().info("Parse Markdown to HTML");
-		processMarkdown(markdownDTOs);
+		processMarkdown(markdownDTOs, options);
+	}
+
+	private int getPegdownExtensions(String extensions) {
+		int options = 0;
+		for (String ext : Arrays.asList(extensions.split("\\s*,\\s*"))) {
+			try {
+				if (!ext.isEmpty()) {
+					Field f = Extensions.class.getField(ext);
+					options |= f.getInt(null);
+				}
+			} catch (NoSuchFieldException e) {
+				throw new IllegalArgumentException("No such extension: " + ext);
+			} catch (IllegalAccessException e) {
+				throw new IllegalArgumentException("Cannot read int value for extension " + ext + ": " + e, e);
+			}
+		}
+
+		// getLog().info("Pegdown extension options = " + options);
+
+		return options;
+
 	}
 
 	/**
@@ -111,7 +171,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 	 * @throws MojoExecutionException
 	 *             Unable to write file
 	 */
-	private void processMarkdown(List<MarkdownDTO> markdownDTOs) throws MojoExecutionException {
+	private void processMarkdown(List<MarkdownDTO> markdownDTOs, int options) throws MojoExecutionException {
 		getLog().debug("processMarkdown");
 
 		for (MarkdownDTO dto : markdownDTOs) {
@@ -130,7 +190,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				String markdown = FileUtils.readFileToString(dto.markdownFile);
 				// getLog().debug(markdown);
 
-				String markdownAsHtml = new PegDownProcessor().markdownToHtml(markdown);
+				String markdownAsHtml = new PegDownProcessor(options).markdownToHtml(markdown);
 				StringBuilder data = new StringBuilder();
 				data.append(headerHtml);
 				data.append(markdownAsHtml);

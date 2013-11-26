@@ -2,7 +2,7 @@
 
 Plugin creates static HTML pages with Maven and Markdown. Uses [pegdown](https://github.com/sirthias/pegdown) Markdown processor.
 
-You can configure the input and output directories and which files to copy. You can also include custom header and footer and general title. 
+You can configure the input and output directories, which files to copy and which pegdown options are used. You can also include custom header and footer and general title. 
 
 Default configuration which can be overridden:
 
@@ -32,6 +32,7 @@ Configuration options:
 
 * copyDirectories :	Comma separead list of directories to copy to output directory, like: css,js,images
 * defaultTitle : if set the titleToken is replaced in every page. Otherwise the first h1 is used.
+* pegdownExtensions: Comma separated list of constants as specified in org.pegdown.Extensions. The default is TABLES.
 
 The output will be:
 * target/html/name_of_file.html
@@ -79,3 +80,21 @@ Or with custom header and footer:
 			</configuration>
 		</plugin>
 		
+You can also specify the Pegdown extensions:  
+
+		<plugin>
+			<groupId>com.ruleoftech</groupId>
+			<artifactId>markdown-page-generator-plugin</artifactId>
+			<version>0.1-SNAPSHOT</version>
+			<executions>
+				<execution>
+					<phase>process-sources</phase>
+					<goals>
+						<goal>generate</goal>
+					</goals>
+				</execution>
+			</executions>
+			<configuration>
+				<pegdownExtensions>TABLES,FENCED_CODE_BLOCKS,AUTOLINKS</pegdownExtensions>
+			</configuration>
+		</plugin>
