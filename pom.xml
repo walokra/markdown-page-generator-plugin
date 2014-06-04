@@ -10,7 +10,7 @@
 
 	<groupId>com.ruleoftech</groupId>
 	<artifactId>markdown-page-generator-plugin</artifactId>
-	<version>0.3</version>
+	<version>0.4-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 	<name>Markdown Page Generator Maven Plugin</name>
 	<description>Markdown to HTML Page Generator Maven Plugin</description> 
@@ -67,6 +67,21 @@
 	</dependencies>
 
 	<build>
+		<pluginManagement>
+			<plugins>
+		        <plugin>
+		            <groupId>org.apache.maven.plugins</groupId>
+		            <artifactId>maven-release-plugin</artifactId>
+		            <version>2.1</version>
+		            <configuration>
+		                <mavenExecutorId>forked-path</mavenExecutorId>
+		                <useReleaseProfile>false</useReleaseProfile>
+		                <arguments>${arguments} -Psonatype-oss-release</arguments>
+		            </configuration>
+		        </plugin>
+		    </plugins>
+		</pluginManagement>
+		
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -100,21 +115,6 @@
 			</plugin>
 		</plugins>
 	</build>
-	
-	<pluginManagement>
-		<plugins>
-	        <plugin>
-	            <groupId>org.apache.maven.plugins</groupId>
-	            <artifactId>maven-release-plugin</artifactId>
-	            <version>2.1</version>
-	            <configuration>
-	                <mavenExecutorId>forked-path</mavenExecutorId>
-	                <useReleaseProfile>false</useReleaseProfile>
-	                <arguments>${arguments} -Psonatype-oss-release</arguments>
-	            </configuration>
-	        </plugin>
-	    </plugins>
-	</pluginManagement>
 		
 	<profiles>
 	  <profile>
