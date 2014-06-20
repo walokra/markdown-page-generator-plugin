@@ -2,7 +2,15 @@
 
 Plugin creates static HTML pages with Maven and Markdown. Uses [pegdown](https://github.com/sirthias/pegdown) Markdown processor. The code is Open Source and under MIT license.
 
-The plugin can be found in Sonatype's OSS repository (https://oss.sonatype.org/content/groups/public/com/ruleoftech/markdown-page-generator-plugin/) and in Central Repository (http://search.maven.org/).
+The plugin can be found in [Sonatype's OSS repository](https://oss.sonatype.org/content/groups/public/com/ruleoftech/markdown-page-generator-plugin/) and in [Central Repository](http://search.maven.org/).
+
+Dependency Information:
+
+        <dependency>
+            <groupId>com.ruleoftech</groupId>
+            <artifactId>markdown-page-generator-plugin</artifactId>
+            <version>0.4</version>
+        </dependency>
 
 You can configure the input and output directories, which files to copy and which pegdown options are used. You can also include custom header and footer and general title. 
 
