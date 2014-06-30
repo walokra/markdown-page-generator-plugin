@@ -39,6 +39,9 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 	@Parameter(property = "generate.footerHtmlFile")
 	private String footerHtmlFile;
 
+    @Parameter(property = "generate.recursiveInput", defaultValue = "false")
+    private boolean recursiveInput;
+    
 	// Possible options
 	// SMARTS: Beautifies apostrophes, ellipses ("..." and ". . .") and dashes ("--" and "---")
 	// QUOTES: Beautifies single quotes, double quotes and double angle quotes (« and »)
@@ -96,13 +99,15 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 		}
 
 		getLog().info("Read Markdown files from input directory");
-		readFiles();
+		boolean hasFiles = readFiles();
 
-		getLog().info("Process Pegdown extension options");
-		int options = getPegdownExtensions(pegdownExtensions);
+        if (hasFiles) {
+            getLog().info("Process Pegdown extension options");
+            int options = getPegdownExtensions(pegdownExtensions);
 
-		getLog().info("Parse Markdown to HTML");
-		processMarkdown(markdownDTOs, options);
+            getLog().info("Parse Markdown to HTML");
+            processMarkdown(markdownDTOs, options);
+        }
 	}
 
 	private int getPegdownExtensions(String extensions) {
@@ -129,15 +134,23 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 	/**
 	 * Read Markdown files from directory.
 	 * 
+     * @return boolean
+     *             Is there files to read
 	 * @throws MojoExecutionException
 	 *             Unable to load file
 	 */
-	private void readFiles() throws MojoExecutionException {
+	private boolean readFiles() throws MojoExecutionException {
 		getLog().debug("Read files from: " + inputDirectory);
 
 		try {
-			// Reading just the markdown dir and not sub dirs
-			List<File> markdownFiles = getFilesAsArray(FileUtils.iterateFiles(new File(inputDirectory), new String[] { "md" }, false));
+			File inputFile = new File(inputDirectory);
+			if (!inputFile.exists()) {
+				getLog().info("There is no input folder for the project. Skipping.");
+				return false;
+			}
+			 
+			// Reading just the markdown dir and sub dirs if recursive option set
+			List<File> markdownFiles = getFilesAsArray(FileUtils.iterateFiles(new File(inputDirectory), new String[] { "md" }, recursiveInput));
 
 			for (File file : markdownFiles) {
 				getLog().debug("File getName() " + file.getName());
@@ -147,6 +160,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				MarkdownDTO dto = new MarkdownDTO();
 				dto.markdownFile = file;
 
+                // TODO Fix copy and include the folder structure
 				if (!StringUtils.isNotEmpty(defaultTitle)) {
 					List<String> raw = FileUtils.readLines(file);
 					dto.title = getTitle(raw);
@@ -162,6 +176,8 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 		} catch (IOException e) {
 			throw new MojoExecutionException("Unable to load file " + e.getMessage(), e);
 		}
+		
+		return true;
 	}
 
 	/**
@@ -254,12 +270,18 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 	private void copyFiles(String fromDir, String toDir) throws MojoExecutionException {
 		getLog().debug("fromDir=" + fromDir + "; toDir=" + toDir);
 		try {
-			// get files but not from the sub dirs
-			Iterator<File> files = FileUtils.iterateFiles(new File(fromDir), null, false);
-			while (files.hasNext()) {
-				File file = files.next();
-				FileUtils.copyFileToDirectory(file, new File(toDir));
-			}
+			File fromDirFile = new File(fromDir);
+            if (fromDirFile.exists()) {
+                Iterator<File> files = FileUtils.iterateFiles(new File(fromDir), null, false);
+                while (files.hasNext()) {
+                    File file = files.next();
+                    if (file.exists()) {
+                        FileUtils.copyFileToDirectory(file, new File(toDir));
+                    } else {
+                        getLog().error("File '" + file.getAbsolutePath() + "' does not exist. Skipping copy");
+                    }
+                }
+            }
 		} catch (IOException e) {
 			throw new MojoExecutionException("Unable to copy file " + e.getMessage(), e);
 		}
