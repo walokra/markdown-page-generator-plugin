@@ -160,7 +160,6 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				MarkdownDTO dto = new MarkdownDTO();
 				dto.markdownFile = file;
 
-                // TODO Fix copy and include the folder structure
 				if (!StringUtils.isNotEmpty(defaultTitle)) {
 					List<String> raw = FileUtils.readLines(file);
 					dto.title = getTitle(raw);
@@ -168,7 +167,11 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 					dto.title = defaultTitle;
 				}
 
-				File htmlFile = new File(outputDirectory + "/" + file.getName().replaceAll(".md", ".html"));
+                File htmlFile = new File(
+                        recursiveInput
+                                ? outputDirectory + "/" + file.getParentFile().getPath().substring(0, inputFile.getPath().length()) + "/" + file.getName().replaceAll(".md", ".html")
+                                : outputDirectory + "/" + file.getName().replaceAll(".md", ".html")
+                );
 				dto.htmlFile = htmlFile;
 
 				markdownDTOs.add(dto);
