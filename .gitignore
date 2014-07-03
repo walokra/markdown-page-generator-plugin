@@ -1,5 +1,12 @@
+target/
+release.properties
+
+# Eclipse files
 .settings/
 .classpath
 .project
-target/
-release.properties
+
+# IDEA files
+.idea
+*.iml
+

@@ -169,7 +169,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
                 File htmlFile = new File(
                         recursiveInput
-                                ? outputDirectory + "/" + file.getParentFile().getPath().substring(0, inputFile.getPath().length()) + "/" + file.getName().replaceAll(".md", ".html")
+                                ? outputDirectory + "/" + file.getParentFile().getPath().substring(inputFile.getPath().length()) + "/" + file.getName().replaceAll(".md", ".html")
                                 : outputDirectory + "/" + file.getName().replaceAll(".md", ".html")
                 );
 				dto.htmlFile = htmlFile;
