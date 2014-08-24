@@ -4,6 +4,9 @@ Plugin creates static HTML pages with Maven and Markdown. Uses [pegdown](https:/
 
 The plugin can be found in [Sonatype's OSS repository](https://oss.sonatype.org/content/groups/public/com/ruleoftech/markdown-page-generator-plugin/) and in [Central Repository](http://search.maven.org/).
 
+Continuous integration:
+[![Build Status](https://travis-ci.org/walokra/markdown-page-generator-plugin.svg?branch=master)](https://travis-ci.org/walokra/markdown-page-generator-plugin)
+
 Dependency Information:
 
         <dependency>
