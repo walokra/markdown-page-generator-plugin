@@ -148,6 +148,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				getLog().info("There is no input folder for the project. Skipping.");
 				return false;
 			}
+			int baseDepth = StringUtils.countMatches(inputFile.getAbsolutePath(), "/");
 			 
 			// Reading just the markdown dir and sub dirs if recursive option set
 			List<File> markdownFiles = getFilesAsArray(FileUtils.iterateFiles(new File(inputDirectory), new String[] { "md" }, recursiveInput));
@@ -159,6 +160,8 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
 				MarkdownDTO dto = new MarkdownDTO();
 				dto.markdownFile = file;
+
+				dto.folderDepth = StringUtils.countMatches(file.getAbsolutePath(), "/") - (baseDepth + 1);
 
 				if (!StringUtils.isNotEmpty(defaultTitle)) {
 					List<String> raw = FileUtils.readLines(file);
@@ -202,9 +205,11 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				if (StringUtils.isNotEmpty(headerHtmlFile)) {
 					headerHtml = FileUtils.readFileToString(new File(headerHtmlFile));
 					headerHtml = addTitleToHtmlFile(headerHtml, dto.title);
+					headerHtml = updateRelativePaths(headerHtml, dto.folderDepth);
 				}
 				if (StringUtils.isNotEmpty(footerHtmlFile)) {
 					footerHtml = FileUtils.readFileToString(new File(footerHtmlFile));
+					footerHtml = updateRelativePaths(footerHtml, dto.folderDepth);
 				}
 				String markdown = FileUtils.readFileToString(dto.markdownFile);
 				// getLog().debug(markdown);
@@ -261,6 +266,38 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 	}
 
 	/**
+	 * Update relative include paths corresponding to the markdown file's location in the folder structure.
+	 *
+	 * @param html
+	 *            The HTML string
+	 * @param folderDepth
+	 *            Current markdown file's folder depth
+	 */
+	private String updateRelativePaths(String html, int folderDepth) {
+		if (html == null) {
+			return html;
+		}
+		getLog().debug("Updating relative paths in html includes (css, js).");
+		return html.replaceAll("##SITE_BASE##", getSiteBasePrefix(folderDepth));
+	}
+
+	/**
+	 * Calculates relative path to site's base for folder depth.
+	 *
+	 * @param folderDepth
+	 *            Current markdown file's folder depth
+	 */
+	private String getSiteBasePrefix(int folderDepth) {
+		String pathToBase = ".";
+		while(folderDepth > 0) {
+			pathToBase += "/..";
+			folderDepth--;
+		}
+		return pathToBase;
+	}
+
+
+	/**
 	 * Copy files from one dir to another based on file extensions.
 	 * 
 	 * @param fromDir
@@ -306,6 +343,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 		public String title;
 		public File htmlFile;
 		public File markdownFile;
+		public int folderDepth = 0;
 	}
 
 }
