@@ -46,6 +46,7 @@ Configuration options:
 * copyDirectories :	Comma separead list of directories to copy to output directory, like: css,js,images
 * defaultTitle : If set the titleToken is replaced in every page. Otherwise the first h1 is used.
 * recursiveInput : Process also inputDirectory's sub directories if option true. Default false.
+* transformRelativeMarkdownLinks : Transform relative url suffix from ".md" to ".html" if option true. Default false.
 * pegdownExtensions: Comma separated list of constants as specified in org.pegdown.Extensions. The default is TABLES.
 
 The output will be:

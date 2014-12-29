@@ -41,6 +41,9 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
     @Parameter(property = "generate.recursiveInput", defaultValue = "false")
     private boolean recursiveInput;
+
+    @Parameter(property = "generate.transformRelativeMarkdownLinks", defaultValue = "false")
+    private boolean transformRelativeMarkdownLinks;
     
 	// Possible options
 	// SMARTS: Beautifies apostrophes, ellipses ("..." and ". . .") and dashes ("--" and "---")
@@ -209,7 +212,12 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				String markdown = FileUtils.readFileToString(dto.markdownFile);
 				// getLog().debug(markdown);
 
-				String markdownAsHtml = new PegDownProcessor(options).markdownToHtml(markdown);
+				String markdownAsHtml;
+				if (transformRelativeMarkdownLinks) {
+					markdownAsHtml = new PegDownProcessor(options).markdownToHtml(markdown, new MDToHTMLExpLinkRender());
+				} else {
+					markdownAsHtml = new PegDownProcessor(options).markdownToHtml(markdown);
+				}
 				StringBuilder data = new StringBuilder();
 				data.append(headerHtml);
 				data.append(markdownAsHtml);
