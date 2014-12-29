@@ -33,8 +33,11 @@ Configuration options:
 		<head>
 			<title>titleToken</title>
 			<meta charset="utf-8" />
+			<link rel="stylesheet" href="##SITE_BASE##/css/default.css">
 		</head>
 		
+	Note: **##SITE_BASE##** will be translated to a relative path from the markdown file's directory to base directory. This is not necessary if *recursiveInput* configuration is false.
+
 * footerHtmlFile : Location of header HTML file as String, ${project.basedir}/src/main/resources/markdown/html/footer.html
 	
 	Example:
