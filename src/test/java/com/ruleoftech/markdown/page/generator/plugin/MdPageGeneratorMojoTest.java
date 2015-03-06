@@ -1,5 +1,6 @@
 package com.ruleoftech.markdown.page.generator.plugin;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 
 import java.io.File;
@@ -9,6 +10,43 @@ import java.io.File;
  */
 public class MdPageGeneratorMojoTest
         extends AbstractMojoTestCase {
+
+    public void testEncoding() throws Exception {
+
+        // ensure this java-File will not be affected by
+        // encoding issues therefore escape umlaut-characters
+        final String UMLAUTS =
+            "Some Umlauts: " +
+            "\u00f6" + // &ouml;
+            "\u00e4" + // &auml;
+            "\u00fc" + // &uuml;
+            " " +
+            "\u00d6" + // &Ouml;
+            "\u00c4" + // &Auml;
+            "\u00dc" + // &Uuml;
+            " " + //
+            "\u00df"; // &szlig;
+        final String EURO =
+            "Euro: " +
+            "\u20ac"; // &euro;
+
+        File pom = getTestFile("src/test/resources/encoding-project/pom.xml");
+        assertTrue(pom.exists());
+
+        MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupMojo("generate", pom);
+        assertNotNull(mdPageGeneratorMojo);
+
+        mdPageGeneratorMojo.execute();
+
+        File generatedMarkdown = new File(getBasedir(), "/target/test-harness/encoding-project/html/README.html");
+        assertNotNull(generatedMarkdown);
+        assertTrue(generatedMarkdown.exists());
+
+        String markDown = FileUtils.readFileToString(generatedMarkdown, "ISO-8859-15");
+        assertNotNull(markDown);
+        assertTrue(markDown.contains(UMLAUTS));
+        assertTrue(markDown.contains(EURO));
+    }
 
     public void testBasicProject()
             throws Exception {

@@ -3,6 +3,7 @@ package com.ruleoftech.markdown.page.generator.plugin;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -44,7 +45,13 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
     @Parameter(property = "generate.transformRelativeMarkdownLinks", defaultValue = "false")
     private boolean transformRelativeMarkdownLinks;
-    
+
+	@Parameter(property = "generate.inputEncoding", defaultValue="${project.build.sourceEncoding}")
+	private String inputEncoding;
+
+	@Parameter(property = "generate.outputEncoding", defaultValue="${project.build.sourceEncoding}")
+	private String outputEncoding;
+
 	// Possible options
 	// SMARTS: Beautifies apostrophes, ellipses ("..." and ". . .") and dashes ("--" and "---")
 	// QUOTES: Beautifies single quotes, double quotes and double angle quotes (« and »)
@@ -167,7 +174,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				dto.folderDepth = StringUtils.countMatches(file.getAbsolutePath(), "/") - (baseDepth + 1);
 
 				if (!StringUtils.isNotEmpty(defaultTitle)) {
-					List<String> raw = FileUtils.readLines(file);
+					List<String> raw = FileUtils.readLines(file, getInputEncoding());
 					dto.title = getTitle(raw);
 				} else {
 					dto.title = defaultTitle;
@@ -198,7 +205,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 	 */
 	private void processMarkdown(List<MarkdownDTO> markdownDTOs, int options) throws MojoExecutionException {
 		getLog().debug("processMarkdown");
-
+		getLog().debug("inputEncoding: '" + getInputEncoding() + "', outputEncoding: '" + getOutputEncoding() + "'");
 		for (MarkdownDTO dto : markdownDTOs) {
 			getLog().debug("dto: " + dto);
 
@@ -206,15 +213,15 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				String headerHtml = "";
 				String footerHtml = "";
 				if (StringUtils.isNotEmpty(headerHtmlFile)) {
-					headerHtml = FileUtils.readFileToString(new File(headerHtmlFile));
+					headerHtml = FileUtils.readFileToString(new File(headerHtmlFile), getInputEncoding());
 					headerHtml = addTitleToHtmlFile(headerHtml, dto.title);
 					headerHtml = updateRelativePaths(headerHtml, dto.folderDepth);
 				}
 				if (StringUtils.isNotEmpty(footerHtmlFile)) {
-					footerHtml = FileUtils.readFileToString(new File(footerHtmlFile));
+					footerHtml = FileUtils.readFileToString(new File(footerHtmlFile), getInputEncoding());
 					footerHtml = updateRelativePaths(footerHtml, dto.folderDepth);
 				}
-				String markdown = FileUtils.readFileToString(dto.markdownFile);
+				String markdown = FileUtils.readFileToString(dto.markdownFile, getInputEncoding());
 				// getLog().debug(markdown);
 
 				String markdownAsHtml;
@@ -228,11 +235,27 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				data.append(markdownAsHtml);
 				data.append(footerHtml);
 
-				FileUtils.writeStringToFile(dto.htmlFile, data.toString());
+				FileUtils.writeStringToFile(dto.htmlFile, data.toString(), getOutputEncoding());
 			} catch (IOException e) {
 				getLog().error("Error : " + e.getMessage(), e);
 				throw new MojoExecutionException("Unable to write file " + e.getMessage(), e);
 			}
+		}
+	}
+
+	private String getInputEncoding () {
+		if (StringUtils.isBlank(inputEncoding)) {
+			return Charset.defaultCharset().name();
+		} else {
+			return inputEncoding;
+		}
+	}
+
+	private String getOutputEncoding () {
+		if (StringUtils.isBlank(outputEncoding)) {
+			return Charset.defaultCharset().name();
+		} else {
+			return outputEncoding;
 		}
 	}
 
