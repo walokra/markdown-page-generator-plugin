@@ -51,6 +51,8 @@ Configuration options:
 * recursiveInput : Process also inputDirectory's sub directories if option true. Default false.
 * transformRelativeMarkdownLinks : Transform relative url suffix from ".md" to ".html" if option true. Default false.
 * pegdownExtensions: Comma separated list of constants as specified in org.pegdown.Extensions. The default is TABLES.
+* inputEncoding: Charset-Name used for reading the md-input, default: ${project.build.sourceEncoding} or Default-Charset
+* outputEncoding: Charset-Name used for writing the html-output, default: ${project.build.sourceEncoding} or Default-Charset
 
 The output will be:
 * target/html/name_of_file.html
@@ -115,4 +117,26 @@ You can also specify the Pegdown extensions:
 			<configuration>
 				<pegdownExtensions>TABLES,FENCED_CODE_BLOCKS,AUTOLINKS</pegdownExtensions>
 			</configuration>
+		</plugin>
+
+Input- and Output-Encoding can be specified by:
+
+		<plugin>
+			<groupId>com.ruleoftech</groupId>
+			<artifactId>markdown-page-generator-plugin</artifactId>
+			<version>0.4</version>
+			<executions>
+				<execution>
+					<phase>process-sources</phase>
+					<goals>
+						<goal>generate</goal>
+					</goals>
+				</execution>
+			</executions>
+                <configuration>
+                    <inputDirectory>${basedir}/src/test/resources/encoding-project/src/main/resources/markdown</inputDirectory>
+                    <outputDirectory>${basedir}/target/test-harness/encoding-project/html</outputDirectory>
+                    <inputEncoding>UTF-8</inputEncoding>
+                    <outputEncoding>ISO-8859-15</outputEncoding>
+                </configuration>
 		</plugin>
