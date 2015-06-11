@@ -161,7 +161,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				getLog().info("There is no input folder for the project. Skipping.");
 				return false;
 			}
-			int baseDepth = StringUtils.countMatches(inputFile.getAbsolutePath(), "/");
+			int baseDepth = StringUtils.countMatches(inputFile.getAbsolutePath(), File.separator);
 			 
 			// Reading just the markdown dir and sub dirs if recursive option set
 			List<File> markdownFiles = getFilesAsArray(FileUtils.iterateFiles(new File(inputDirectory), new String[] { "md" }, recursiveInput));
@@ -174,7 +174,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				MarkdownDTO dto = new MarkdownDTO();
 				dto.markdownFile = file;
 
-				dto.folderDepth = StringUtils.countMatches(file.getAbsolutePath(), "/") - (baseDepth + 1);
+				dto.folderDepth = StringUtils.countMatches(file.getAbsolutePath(), File.separator) - (baseDepth + 1);
                                 
                                 if(alwaysUseDefaultTitle){
                                     dto.title = defaultTitle;
