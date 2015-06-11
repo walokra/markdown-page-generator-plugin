@@ -273,12 +273,25 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 		if (raw == null) {
 			return defaultTitle;
 		}
+                String previousLine = "";
 		for (String line : raw) {
+                        line = line.trim();
 			if (line.startsWith("#")) {
 				line = line.replace("#", "");
-				line = line.trim();
 				return line;
 			}
+                        //Checking for Setext style headers. 
+                        //Line is considered a match if it passes:
+                        //Starts with either = or -
+                        //It has the same number of characters as the previous line
+                        //It only contains - or = and nothing else. 
+                        //
+                        //If there is a match we consider the previous line to be the title.
+                        if ((line.startsWith("=") && StringUtils.countMatches(line, "=") == previousLine.length() && line.matches("^=+$")) 
+                                ||(line.startsWith("-") && StringUtils.countMatches(line, "-") == previousLine.length() && line.matches("^-+$"))) {
+				return previousLine;
+			}
+                        previousLine = line;
 		}
 		return defaultTitle;
 	}
