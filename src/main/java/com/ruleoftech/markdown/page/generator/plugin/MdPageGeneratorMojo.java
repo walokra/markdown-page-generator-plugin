@@ -74,7 +74,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 	private enum EPegdownExtensions {
 		NONE(0x00), SMARTS(0x01), QUOTES(0x02), SMARTYPANTS(EPegdownExtensions.SMARTS.getValue() + EPegdownExtensions.QUOTES.getValue()), ABBREVIATIONS(
 				0x04), HARDWRAPS(0x08), AUTOLINKS(0x10), TABLES(0x20), DEFINITIONS(0x40), FENCED_CODE_BLOCKS(0x80), WIKILINKS(0x100), ALL(
-				0x0000FFFF), SUPPRESS_HTML_BLOCKS(0x00010000), SUPPRESS_INLINE_HTML(0x00020000), SUPPRESS_ALL_HTML(0x00030000);
+				0x0000FFFF), SUPPRESS_HTML_BLOCKS(0x00010000), SUPPRESS_INLINE_HTML(0x00020000), SUPPRESS_ALL_HTML(0x00030000), ANCHORLINKS(0x400);
 
 		private final int value;
 
@@ -185,8 +185,8 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
                 File htmlFile = new File(
                         recursiveInput
-                                ? outputDirectory + "/" + file.getParentFile().getPath().substring(inputFile.getPath().length()) + "/" + file.getName().replaceAll(".md", ".html")
-                                : outputDirectory + "/" + file.getName().replaceAll(".md", ".html")
+                                ? outputDirectory + File.separator + file.getParentFile().getPath().substring(inputFile.getPath().length()) + File.separator + file.getName().replaceAll(".md", ".html")
+                                : outputDirectory + File.separator + file.getName().replaceAll(".md", ".html")
                 );
 				dto.htmlFile = htmlFile;
 
