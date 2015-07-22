@@ -28,7 +28,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 	@Parameter(property = "generate.defaultTitle")
 	private String defaultTitle;
         
-        @Parameter(property = "generate.alwaysUseDefaultTitle", defaultValue = "false")
+	@Parameter(property = "generate.alwaysUseDefaultTitle", defaultValue = "false")
 	private boolean alwaysUseDefaultTitle;
 
 	@Parameter(property = "generate.inputDirectory", defaultValue = "${project.basedir}/src/main/resources/markdown/")
@@ -54,6 +54,9 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
 	@Parameter(property = "generate.outputEncoding", defaultValue="${project.build.sourceEncoding}")
 	private String outputEncoding;
+
+	@Parameter(property = "generate.parsingTimeoutInMillis")
+	private Long parsingTimeoutInMillis;
 
 	// Possible options
 	// SMARTS: Beautifies apostrophes, ellipses ("..." and ". . .") and dashes ("--" and "---")
@@ -209,6 +212,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 	private void processMarkdown(List<MarkdownDTO> markdownDTOs, int options) throws MojoExecutionException {
 		getLog().debug("processMarkdown");
 		getLog().debug("inputEncoding: '" + getInputEncoding() + "', outputEncoding: '" + getOutputEncoding() + "'");
+		getLog().debug("parsingTimeout: " + getParsingTimeoutInMillis() + " ms");
 		for (MarkdownDTO dto : markdownDTOs) {
 			getLog().debug("dto: " + dto);
 
@@ -227,11 +231,12 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				String markdown = FileUtils.readFileToString(dto.markdownFile, getInputEncoding());
 				// getLog().debug(markdown);
 
+				PegDownProcessor pegDownProcessor = new PegDownProcessor(options, getParsingTimeoutInMillis());
 				String markdownAsHtml;
 				if (transformRelativeMarkdownLinks) {
-					markdownAsHtml = new PegDownProcessor(options).markdownToHtml(markdown, new MDToHTMLExpLinkRender());
+					markdownAsHtml = pegDownProcessor.markdownToHtml(markdown, new MDToHTMLExpLinkRender());
 				} else {
-					markdownAsHtml = new PegDownProcessor(options).markdownToHtml(markdown);
+					markdownAsHtml = pegDownProcessor.markdownToHtml(markdown);
 				}
 				StringBuilder data = new StringBuilder();
 				data.append(headerHtml);
@@ -260,6 +265,14 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 		} else {
 			return outputEncoding;
 		}
+	}
+
+	private long getParsingTimeoutInMillis() {
+		if (parsingTimeoutInMillis != null) {
+			return parsingTimeoutInMillis;
+		}
+
+		return PegDownProcessor.DEFAULT_MAX_PARSING_TIME;
 	}
 
 	/**
