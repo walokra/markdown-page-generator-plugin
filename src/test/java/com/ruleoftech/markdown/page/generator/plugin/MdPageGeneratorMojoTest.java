@@ -1,7 +1,9 @@
 package com.ruleoftech.markdown.page.generator.plugin;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.pegdown.ParsingTimeoutException;
 
 import java.io.File;
 
@@ -83,6 +85,22 @@ public class MdPageGeneratorMojoTest
 
         File page11 = new File(getBasedir(), "/target/test-harness/recursive-project/html/pages/embedded/page-1-1.html");
         assertTrue(page11.exists());
+    }
+
+    public void testParsingTimeout()
+            throws Exception {
+        File pom = getTestFile("src/test/resources/timeout-project/pom.xml");
+        assertTrue(pom.exists());
+
+        MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupMojo("generate", pom);
+        assertNotNull(mdPageGeneratorMojo);
+
+        try {
+            mdPageGeneratorMojo.execute();
+            fail();
+        } catch (Exception ex) {
+            assertEquals(ParsingTimeoutException.class, ex.getCause().getClass());
+        }
     }
 
 }
