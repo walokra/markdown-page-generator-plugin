@@ -12,7 +12,7 @@ Dependency Information:
         <dependency>
             <groupId>com.ruleoftech</groupId>
             <artifactId>markdown-page-generator-plugin</artifactId>
-            <version>0.4</version>
+            <version>0.8</version>
         </dependency>
 
 You can configure the input and output directories, which files to copy and which pegdown options are used. You can also include custom header and footer and general title. 
@@ -53,6 +53,7 @@ Configuration options:
 * pegdownExtensions: Comma separated list of constants as specified in org.pegdown.Extensions. The default is TABLES.
 * inputEncoding: Charset-Name used for reading the md-input, default: ${project.build.sourceEncoding} or Default-Charset
 * outputEncoding: Charset-Name used for writing the html-output, default: ${project.build.sourceEncoding} or Default-Charset
+* parsingTimeoutInMillis: timeout for the Markdown parser, default is 2000 millis
 
 The output will be:
 * target/html/name_of_file.html
@@ -66,7 +67,7 @@ Add the plugin to the pom file in your project:
 				<plugin>
 					<groupId>com.ruleoftech</groupId>
 					<artifactId>markdown-page-generator-plugin</artifactId>
-					<version>0.4</version>
+					<version>0.8</version>
 					<executions>
 						<execution>
 							<phase>process-sources</phase>
@@ -84,7 +85,7 @@ Or with custom header and footer:
 		<plugin>
 			<groupId>com.ruleoftech</groupId>
 			<artifactId>markdown-page-generator-plugin</artifactId>
-			<version>0.4</version>
+			<version>0.8</version>
 			<executions>
 				<execution>
 					<phase>process-sources</phase>
@@ -105,7 +106,7 @@ You can also specify the Pegdown extensions:
 		<plugin>
 			<groupId>com.ruleoftech</groupId>
 			<artifactId>markdown-page-generator-plugin</artifactId>
-			<version>0.4</version>
+			<version>0.8</version>
 			<executions>
 				<execution>
 					<phase>process-sources</phase>
@@ -124,7 +125,7 @@ Input- and Output-Encoding can be specified by:
 		<plugin>
 			<groupId>com.ruleoftech</groupId>
 			<artifactId>markdown-page-generator-plugin</artifactId>
-			<version>0.4</version>
+			<version>0.8</version>
 			<executions>
 				<execution>
 					<phase>process-sources</phase>
