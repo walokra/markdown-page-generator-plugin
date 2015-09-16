@@ -75,8 +75,12 @@ public class MdPageGeneratorMojoTest
 
         mdPageGeneratorMojo.execute();
 
-        File generatedMarkdown = new File(getBasedir(), "/target/test-harness/basic-project/html/README.html");
+        File generatedMarkdown = new File(getBasedir(), "/target/test-harness/basic-project-extension/html/README.html");
         assertTrue(generatedMarkdown.exists());
+        
+        String markDown = FileUtils.readFileToString(generatedMarkdown, "ISO-8859-15");
+        assertNotNull(markDown);
+        assertTrue(markDown.contains("README.html"));
     }
 
     public void testRecursiveProject()
