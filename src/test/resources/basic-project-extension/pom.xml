@@ -35,6 +35,7 @@
                     <inputDirectory>${basedir}/src/test/resources/basic-project-extension/src/main/resources/markdown</inputDirectory>
                     <outputDirectory>${basedir}/target/test-harness/basic-project-extension/html</outputDirectory>
                     <pegdownExtensions>TABLES</pegdownExtensions>
+                    <transformRelativeMarkdownLinks>true</transformRelativeMarkdownLinks>
                     <inputFileExtension>markdown</inputFileExtension>
                 </configuration>
             </plugin>
