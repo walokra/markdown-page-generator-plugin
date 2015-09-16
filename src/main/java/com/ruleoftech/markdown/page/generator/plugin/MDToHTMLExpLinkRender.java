@@ -24,7 +24,7 @@ public class MDToHTMLExpLinkRender extends LinkRenderer {
         String url = node.url;
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
             if(url.endsWith("."+inputFileExtension)){
-                url = url.substring(0, url.length() - 2) + "html";
+                url = url.substring(0, url.length() - inputFileExtension.length()) + "html";
             }else if(url.contains("."+inputFileExtension+"#")){
                 url = url.replace("."+inputFileExtension+"#", ".html#");
             }
