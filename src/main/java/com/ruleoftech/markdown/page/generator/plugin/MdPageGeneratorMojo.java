@@ -43,11 +43,11 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 	@Parameter(property = "generate.footerHtmlFile")
 	private String footerHtmlFile;
 
-    @Parameter(property = "generate.recursiveInput", defaultValue = "false")
-    private boolean recursiveInput;
+        @Parameter(property = "generate.recursiveInput", defaultValue = "false")
+        private boolean recursiveInput;
 
-    @Parameter(property = "generate.transformRelativeMarkdownLinks", defaultValue = "false")
-    private boolean transformRelativeMarkdownLinks;
+        @Parameter(property = "generate.transformRelativeMarkdownLinks", defaultValue = "false")
+        private boolean transformRelativeMarkdownLinks;
 
 	@Parameter(property = "generate.inputEncoding", defaultValue="${project.build.sourceEncoding}")
 	private String inputEncoding;
@@ -57,6 +57,9 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
 	@Parameter(property = "generate.parsingTimeoutInMillis")
 	private Long parsingTimeoutInMillis;
+        
+        @Parameter(property = "generate.inputFileExtension", defaultValue="md")
+	private String inputFileExtension = "md";
 
 	// Possible options
 	// SMARTS: Beautifies apostrophes, ellipses ("..." and ". . .") and dashes ("--" and "---")
@@ -167,7 +170,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 			int baseDepth = StringUtils.countMatches(inputFile.getAbsolutePath(), File.separator);
 			 
 			// Reading just the markdown dir and sub dirs if recursive option set
-			List<File> markdownFiles = getFilesAsArray(FileUtils.iterateFiles(new File(inputDirectory), new String[] { "md" }, recursiveInput));
+			List<File> markdownFiles = getFilesAsArray(FileUtils.iterateFiles(new File(inputDirectory), new String[] { inputFileExtension }, recursiveInput));
 
 			for (File file : markdownFiles) {
 				getLog().debug("File getName() " + file.getName());
@@ -189,7 +192,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
                 File htmlFile = new File(
                         recursiveInput
                                 ? outputDirectory + File.separator + file.getParentFile().getPath().substring(inputFile.getPath().length()) + File.separator + file.getName().replaceAll(".md", ".html")
-                                : outputDirectory + File.separator + file.getName().replaceAll(".md", ".html")
+                                : outputDirectory + File.separator + file.getName().replaceAll(inputFileExtension, ".html")
                 );
 				dto.htmlFile = htmlFile;
 
@@ -234,7 +237,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				PegDownProcessor pegDownProcessor = new PegDownProcessor(options, getParsingTimeoutInMillis());
 				String markdownAsHtml;
 				if (transformRelativeMarkdownLinks) {
-					markdownAsHtml = pegDownProcessor.markdownToHtml(markdown, new MDToHTMLExpLinkRender());
+					markdownAsHtml = pegDownProcessor.markdownToHtml(markdown, new MDToHTMLExpLinkRender(inputFileExtension));
 				} else {
 					markdownAsHtml = pegDownProcessor.markdownToHtml(markdown);
 				}
@@ -267,6 +270,10 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 		}
 	}
 
+        public String getInputFileExtension() {
+            return inputFileExtension;
+        }
+ 
 	private long getParsingTimeoutInMillis() {
 		if (parsingTimeoutInMillis != null) {
 			return parsingTimeoutInMillis;

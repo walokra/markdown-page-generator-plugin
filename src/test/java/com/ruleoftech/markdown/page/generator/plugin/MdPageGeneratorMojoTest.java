@@ -63,6 +63,21 @@ public class MdPageGeneratorMojoTest
         File generatedMarkdown = new File(getBasedir(), "/target/test-harness/basic-project/html/README.html");
         assertTrue(generatedMarkdown.exists());
     }
+    
+    public void testBasicProjectExtension()
+            throws Exception {
+        File pom = getTestFile("src/test/resources/basic-project-extension/pom.xml");
+        assertTrue(pom.exists());
+
+        MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupMojo("generate", pom);
+        assertNotNull(mdPageGeneratorMojo);
+        assertEquals("markdown", mdPageGeneratorMojo.getInputFileExtension());
+
+        mdPageGeneratorMojo.execute();
+
+        File generatedMarkdown = new File(getBasedir(), "/target/test-harness/basic-project/html/README.html");
+        assertTrue(generatedMarkdown.exists());
+    }
 
     public void testRecursiveProject()
             throws Exception {

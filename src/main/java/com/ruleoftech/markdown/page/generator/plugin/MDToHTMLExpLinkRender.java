@@ -8,14 +8,25 @@ import org.pegdown.ast.ExpLinkNode;
 
 public class MDToHTMLExpLinkRender extends LinkRenderer {
 
+    private String inputFileExtension = "md";
+
+    MDToHTMLExpLinkRender(){
+        super();
+    }
+    
+    MDToHTMLExpLinkRender(String inputFileExtension){
+        super();
+        this.inputFileExtension = inputFileExtension;
+    }
+    
     @Override
     public Rendering render(ExpLinkNode node, String text) {
         String url = node.url;
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            if(url.endsWith(".md")){
+            if(url.endsWith("."+inputFileExtension)){
                 url = url.substring(0, url.length() - 2) + "html";
-            }else if(url.contains(".md#")){
-                url = url.replace(".md#", ".html#");
+            }else if(url.contains("."+inputFileExtension+"#")){
+                url = url.replace("."+inputFileExtension+"#", ".html#");
             }
         }
         Rendering rendering = new Rendering(url, text);
