@@ -32,8 +32,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <inputDirectory>${basedir}/src/test/resources/basic-project/src/main/resources/markdown</inputDirectory>
-                    <outputDirectory>${basedir}/target/test-harness/basic-project/html</outputDirectory>
+                    <inputDirectory>${basedir}/src/test/resources/basic-project-extension/src/main/resources/markdown</inputDirectory>
+                    <outputDirectory>${basedir}/target/test-harness/basic-project-extension/html</outputDirectory>
                     <pegdownExtensions>TABLES</pegdownExtensions>
                     <inputFileExtension>markdown</inputFileExtension>
                 </configuration>
