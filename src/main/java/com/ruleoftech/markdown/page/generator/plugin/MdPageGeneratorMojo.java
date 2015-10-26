@@ -63,7 +63,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 	private Long parsingTimeoutInMillis;
 
         @Parameter(property = "generate.inputFileExtension", defaultValue="md")
-	private final String inputFileExtension = "md";
+	private String inputFileExtension = "md";
 
 	// Possible options
 	// SMARTS: Beautifies apostrophes, ellipses ("..." and ". . .") and dashes ("--" and "---")
