@@ -24,6 +24,31 @@ Default configuration which can be overridden:
 
 Configuration options:
 
+* variables substitution
+    
+    Example:
+
+	    header.html
+	    
+            <!DOCTYPE html>
+            <html lang="${lang}">
+            <head>
+            </head>
+
+	    page.md:
+	    
+            # Title
+            {lang=en}
+
+
+       will output in page.html:
+
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+            </head>
+            <h1>Title</h1>
+           
 * headerHtmlFile : Location of header HTML file as String, ${project.basedir}/src/main/resources/markdown/html/header.html
 	
 	Example:
