@@ -1,14 +1,5 @@
 package com.ruleoftech.markdown.page.generator.plugin;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -17,6 +8,17 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.util.StringUtils;
 import org.pegdown.Extensions;
 import org.pegdown.PegDownProcessor;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Creates a static html from markdown files.
@@ -189,6 +191,15 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				    dto.title = getTitle(raw);
                                 }
 
+				for (String line : FileUtils.readLines(file, getInputEncoding())) {
+					if (isVariableLine(line)) {
+						String key = line.replaceAll("(^\\{)|(=.*)", "");
+						String value = line.replaceAll("(^\\{(.*?)=)|(\\}$)", "");
+						getLog().debug("Substitute: '" + key + "' -> '" + value + "'");
+						dto.substitutes.put(key, value);
+					}
+				}
+
                 File htmlFile = new File(
                         recursiveInput
                                 ? outputDirectory + File.separator + file.getParentFile().getPath().substring(inputFile.getPath().length()) + File.separator + file.getName().replaceAll("."+inputFileExtension, ".html")
@@ -225,13 +236,16 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				if (StringUtils.isNotEmpty(headerHtmlFile)) {
 					headerHtml = FileUtils.readFileToString(new File(headerHtmlFile), getInputEncoding());
 					headerHtml = addTitleToHtmlFile(headerHtml, dto.title);
+					headerHtml = replaceVariables(headerHtml, dto.substitutes);
 					headerHtml = updateRelativePaths(headerHtml, dto.folderDepth);
 				}
 				if (StringUtils.isNotEmpty(footerHtmlFile)) {
 					footerHtml = FileUtils.readFileToString(new File(footerHtmlFile), getInputEncoding());
+					footerHtml = replaceVariables(footerHtml, dto.substitutes);
 					footerHtml = updateRelativePaths(footerHtml, dto.folderDepth);
 				}
 				String markdown = FileUtils.readFileToString(dto.markdownFile, getInputEncoding());
+				markdown = replaceVariables(markdown, dto.substitutes);
 				// getLog().debug(markdown);
 
 				PegDownProcessor pegDownProcessor = new PegDownProcessor(options, getParsingTimeoutInMillis());
@@ -338,6 +352,31 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 	}
 
 	/**
+	 * Replace variables to the html file.
+	 *
+	 * @param initialContent
+	 * @param variables
+	 * @return the updated html
+	 */
+	private String replaceVariables(String initialContent, Map<String, String> variables) {
+		if (initialContent == null) {
+			return null;
+		}
+		String newContent = initialContent.replaceAll("(\\{.*=.*\\}?)", "");
+		if (variables != null) {
+			for (Map.Entry<String, String> substitute : variables.entrySet()) {
+				newContent = newContent.replace("${" + substitute.getKey() + "}", substitute.getValue());
+			}
+		}
+		return newContent;
+	}
+
+	private static boolean isVariableLine(String line) {
+		return line.matches("^\\{.*=.*\\}$");
+	}
+
+
+	/**
 	 * Update relative include paths corresponding to the markdown file's location in the folder structure.
 	 *
 	 * @param html
@@ -413,6 +452,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 	 */
 	private class MarkdownDTO {
 		public String title;
+		public Map<String, String> substitutes = new HashMap<String, String>();
 		public File htmlFile;
 		public File markdownFile;
 		public int folderDepth = 0;

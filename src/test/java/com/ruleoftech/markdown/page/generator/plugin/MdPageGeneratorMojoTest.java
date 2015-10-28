@@ -1,7 +1,6 @@
 package com.ruleoftech.markdown.page.generator.plugin;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.pegdown.ParsingTimeoutException;
 
@@ -121,5 +120,31 @@ public class MdPageGeneratorMojoTest
             assertEquals(ParsingTimeoutException.class, ex.getCause().getClass());
         }
     }
+
+    public void testSubstituteProject()
+            throws Exception {
+        File pom = getTestFile("src/test/resources/substitute-project/pom.xml");
+        assertTrue(pom.exists());
+
+        MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupMojo("generate", pom);
+        assertNotNull(mdPageGeneratorMojo);
+
+        mdPageGeneratorMojo.execute();
+
+        File generatedMarkdown = new File(getBasedir(), "/target/test-harness/substitute-project/html/README.html");
+        assertTrue(generatedMarkdown.exists());
+
+        String html = FileUtils.readFileToString(new File(getBasedir() + "/target/test-harness/substitute-project/html/README.html"));
+        
+        assertFalse("Shouldn't contains the var declaration", html.contains("headerSubstitution"));
+        assertFalse("Shouldn't contains the var declaration", html.contains("footerSubstitution"));
+        
+        assertFalse("Shouldn't contains the original var", html.contains("${headerSubstitution}"));
+        assertFalse("Shouldn't contains the original var", html.contains("${footerSubstitution}"));
+        
+        assertTrue("Should contains the replaced var", html.contains("The new header"));
+        assertTrue("Should contains the replaced var", html.contains("The new footer"));
+    }
+
 
 }
