@@ -242,10 +242,12 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 					if (StringUtils.isNotEmpty(headerHtmlFile)) {
 						headerHtml = FileUtils.readFileToString(new File(headerHtmlFile), getInputEncoding());
 						headerHtml = addTitleToHtmlFile(headerHtml, dto.title);
+						headerHtml = replaceVariables(headerHtml, dto.substitutes);
 						headerHtml = updateRelativePaths(headerHtml, dto.folderDepth);
 					}
 					if (StringUtils.isNotEmpty(footerHtmlFile)) {
 						footerHtml = FileUtils.readFileToString(new File(footerHtmlFile), getInputEncoding());
+						footerHtml = replaceVariables(footerHtml, dto.substitutes);
 						footerHtml = updateRelativePaths(footerHtml, dto.folderDepth);
 					}
 				} catch (FileNotFoundException e) {
