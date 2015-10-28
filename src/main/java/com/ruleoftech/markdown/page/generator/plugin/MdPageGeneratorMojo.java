@@ -22,14 +22,14 @@ import java.util.Map;
 
 /**
  * Creates a static html from markdown files.
- * 
+ *
  */
 @Mojo(name = "generate")
 public class MdPageGeneratorMojo extends AbstractMojo {
 
 	@Parameter(property = "generate.defaultTitle")
 	private String defaultTitle;
-        
+
 	@Parameter(property = "generate.alwaysUseDefaultTitle", defaultValue = "false")
 	private boolean alwaysUseDefaultTitle;
 
@@ -45,11 +45,14 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 	@Parameter(property = "generate.footerHtmlFile")
 	private String footerHtmlFile;
 
-        @Parameter(property = "generate.recursiveInput", defaultValue = "false")
-        private boolean recursiveInput;
+	@Parameter(property = "generate.failIfFilesAreMissing", defaultValue = "true")
+	private boolean failIfFilesAreMissing;
 
-        @Parameter(property = "generate.transformRelativeMarkdownLinks", defaultValue = "false")
-        private boolean transformRelativeMarkdownLinks;
+    @Parameter(property = "generate.recursiveInput", defaultValue = "false")
+    private boolean recursiveInput;
+
+    @Parameter(property = "generate.transformRelativeMarkdownLinks", defaultValue = "false")
+    private boolean transformRelativeMarkdownLinks;
 
 	@Parameter(property = "generate.inputEncoding", defaultValue="${project.build.sourceEncoding}")
 	private String inputEncoding;
@@ -59,8 +62,8 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
 	@Parameter(property = "generate.parsingTimeoutInMillis")
 	private Long parsingTimeoutInMillis;
-        
-        @Parameter(property = "generate.inputFileExtension", defaultValue="md")
+
+    @Parameter(property = "generate.inputFileExtension", defaultValue="md")
 	private String inputFileExtension = "md";
 
 	// Possible options
@@ -106,7 +109,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
 	/**
 	 * Execute the maven plugin.
-	 * 
+	 *
 	 * @throws MojoExecutionException
 	 *             Something went wrong
 	 */
@@ -154,7 +157,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
 	/**
 	 * Read Markdown files from directory.
-	 * 
+	 *
      * @return boolean
      *             Is there files to read
 	 * @throws MojoExecutionException
@@ -170,7 +173,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				return false;
 			}
 			int baseDepth = StringUtils.countMatches(inputFile.getAbsolutePath(), File.separator);
-			 
+
 			// Reading just the markdown dir and sub dirs if recursive option set
 			List<File> markdownFiles = getFilesAsArray(FileUtils.iterateFiles(new File(inputDirectory), new String[] { inputFileExtension }, recursiveInput));
 
@@ -183,7 +186,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				dto.markdownFile = file;
 
 				dto.folderDepth = StringUtils.countMatches(file.getAbsolutePath(), File.separator) - (baseDepth + 1);
-                                
+
                                 if(alwaysUseDefaultTitle){
                                     dto.title = defaultTitle;
                                 }else{
@@ -212,14 +215,14 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 		} catch (IOException e) {
 			throw new MojoExecutionException("Unable to load file " + e.getMessage(), e);
 		}
-		
+
 		return true;
 	}
 
 	/**
 	 * Going through list of DTOs and parsing the markdown into HTML.
 	 * Add header and footer to the big String.
-	 * 
+	 *
 	 * @throws MojoExecutionException
 	 *             Unable to write file
 	 */
@@ -233,17 +236,27 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 			try {
 				String headerHtml = "";
 				String footerHtml = "";
-				if (StringUtils.isNotEmpty(headerHtmlFile)) {
-					headerHtml = FileUtils.readFileToString(new File(headerHtmlFile), getInputEncoding());
-					headerHtml = addTitleToHtmlFile(headerHtml, dto.title);
-					headerHtml = replaceVariables(headerHtml, dto.substitutes);
-					headerHtml = updateRelativePaths(headerHtml, dto.folderDepth);
+
+                try {
+					if (StringUtils.isNotEmpty(headerHtmlFile)) {
+						headerHtml = FileUtils.readFileToString(new File(headerHtmlFile), getInputEncoding());
+						headerHtml = addTitleToHtmlFile(headerHtml, dto.title);
+						headerHtml = updateRelativePaths(headerHtml, dto.folderDepth);
+					}
+					if (StringUtils.isNotEmpty(footerHtmlFile)) {
+						footerHtml = FileUtils.readFileToString(new File(footerHtmlFile), getInputEncoding());
+						footerHtml = updateRelativePaths(footerHtml, dto.folderDepth);
+					}
+				} catch (FileNotFoundException e) {
+					if (failIfFilesAreMissing) {
+						throw e;
+					} else {
+						getLog().warn("header and/or footer file is missing.");
+						headerHtml = "";
+						footerHtml = "";
+					}
 				}
-				if (StringUtils.isNotEmpty(footerHtmlFile)) {
-					footerHtml = FileUtils.readFileToString(new File(footerHtmlFile), getInputEncoding());
-					footerHtml = replaceVariables(footerHtml, dto.substitutes);
-					footerHtml = updateRelativePaths(footerHtml, dto.folderDepth);
-				}
+                
 				String markdown = FileUtils.readFileToString(dto.markdownFile, getInputEncoding());
 				markdown = replaceVariables(markdown, dto.substitutes);
 				// getLog().debug(markdown);
@@ -287,7 +300,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         public String getInputFileExtension() {
             return inputFileExtension;
         }
- 
+
 	private long getParsingTimeoutInMillis() {
 		if (parsingTimeoutInMillis != null) {
 			return parsingTimeoutInMillis;
@@ -298,7 +311,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
 	/**
 	 * Get the first h1 for the title.
-	 * 
+	 *
 	 * @param raw
 	 *            The markdown as a list of strings
 	 * @return The first # h1 in the Markdown file
@@ -314,14 +327,14 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 				line = line.replace("#", "");
 				return line;
 			}
-                        //Checking for Setext style headers. 
+                        //Checking for Setext style headers.
                         //Line is considered a match if it passes:
                         //Starts with either = or -
                         //It has the same number of characters as the previous line
-                        //It only contains - or = and nothing else. 
+                        //It only contains - or = and nothing else.
                         //
                         //If there is a match we consider the previous line to be the title.
-                        if ((line.startsWith("=") && StringUtils.countMatches(line, "=") == previousLine.length() && line.matches("^=+$")) 
+                        if ((line.startsWith("=") && StringUtils.countMatches(line, "=") == previousLine.length() && line.matches("^=+$"))
                                 ||(line.startsWith("-") && StringUtils.countMatches(line, "-") == previousLine.length() && line.matches("^-+$"))) {
 				return previousLine;
 			}
@@ -332,7 +345,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
 	/**
 	 * Adds the title to the html file.
-	 * 
+	 *
 	 * @param html
 	 *            The HTML string
 	 * @param title
@@ -410,7 +423,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
 	/**
 	 * Copy files from one dir to another based on file extensions.
-	 * 
+	 *
 	 * @param fromDir
 	 *            the directory to copy from
 	 * @param toDir
@@ -448,7 +461,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
 	/**
 	 * Store information about markdown file.
-	 * 
+	 *
 	 */
 	private class MarkdownDTO {
 		public String title;
