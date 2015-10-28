@@ -106,7 +106,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 	@Parameter(property = "generate.copyDirectories")
 	private String copyDirectories;
 
-	protected List<MarkdownDTO> markdownDTOs = new ArrayList<MarkdownDTO>();
+	private List<MarkdownDTO> markdownDTOs = new ArrayList<MarkdownDTO>();
 
 	/**
 	 * Execute the maven plugin.
@@ -204,12 +204,11 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 					}
 				}
 
-                File htmlFile = new File(
+				dto.htmlFile = new File(
                         recursiveInput
                                 ? outputDirectory + File.separator + file.getParentFile().getPath().substring(inputFile.getPath().length()) + File.separator + file.getName().replaceAll("."+inputFileExtension, ".html")
                                 : outputDirectory + File.separator + file.getName().replaceAll("."+inputFileExtension, ".html")
                 );
-				dto.htmlFile = htmlFile;
 
 				markdownDTOs.add(dto);
 			}
@@ -358,13 +357,13 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 		if (html == null) {
 			return html;
 		}
-                if(title != null){
-                    getLog().debug("Setting the title in the HTML file to: " + title);
-                    return html.replaceFirst("titleToken", title);
-                }else{
-                    getLog().debug("Title was null, setting the title in the HTML file to an empty string");
-                    return html.replaceFirst("titleToken", "");
-                }
+        if(title != null){
+            getLog().debug("Setting the title in the HTML file to: " + title);
+            return html.replaceFirst("titleToken", title);
+        }else{
+            getLog().debug("Title was null, setting the title in the HTML file to an empty string");
+            return html.replaceFirst("titleToken", "");
+        }
 	}
 
 	/**

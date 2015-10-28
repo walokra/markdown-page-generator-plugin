@@ -6,7 +6,7 @@ import org.parboiled.common.StringUtils;
 import org.pegdown.LinkRenderer;
 import org.pegdown.ast.ExpLinkNode;
 
-public class MDToHTMLExpLinkRender extends LinkRenderer {
+class MDToHTMLExpLinkRender extends LinkRenderer {
 
     private String inputFileExtension = "md";
 
