@@ -12,7 +12,7 @@ Dependency Information:
         <dependency>
             <groupId>com.ruleoftech</groupId>
             <artifactId>markdown-page-generator-plugin</artifactId>
-            <version>0.8</version>
+            <version>0.10</version>
         </dependency>
 
 You can configure the input and output directories, which files to copy and which pegdown options are used. You can also include custom header and footer and general title. 
@@ -92,7 +92,7 @@ Add the plugin to the pom file in your project:
 				<plugin>
 					<groupId>com.ruleoftech</groupId>
 					<artifactId>markdown-page-generator-plugin</artifactId>
-					<version>0.8</version>
+					<version>0.10</version>
 					<executions>
 						<execution>
 							<phase>process-sources</phase>
@@ -110,7 +110,7 @@ Or with custom header and footer:
 		<plugin>
 			<groupId>com.ruleoftech</groupId>
 			<artifactId>markdown-page-generator-plugin</artifactId>
-			<version>0.8</version>
+			<version>0.10</version>
 			<executions>
 				<execution>
 					<phase>process-sources</phase>
@@ -131,7 +131,7 @@ You can also specify the Pegdown extensions:
 		<plugin>
 			<groupId>com.ruleoftech</groupId>
 			<artifactId>markdown-page-generator-plugin</artifactId>
-			<version>0.8</version>
+			<version>0.10</version>
 			<executions>
 				<execution>
 					<phase>process-sources</phase>
@@ -150,7 +150,7 @@ Input- and Output-Encoding can be specified by:
 		<plugin>
 			<groupId>com.ruleoftech</groupId>
 			<artifactId>markdown-page-generator-plugin</artifactId>
-			<version>0.8</version>
+			<version>0.10</version>
 			<executions>
 				<execution>
 					<phase>process-sources</phase>
