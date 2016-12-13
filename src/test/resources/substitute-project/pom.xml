@@ -38,6 +38,7 @@
                 <configuration>
                     <headerHtmlFile>${basedir}/src/main/resources/markdown/html/header.html</headerHtmlFile>
                     <footerHtmlFile>${basedir}/src/main/resources/markdown/html/footer.html</footerHtmlFile>
+                    <applyFiltering>true</applyFiltering>
                     <pegdownExtensions>TABLES</pegdownExtensions>
                 </configuration>
             </plugin>
