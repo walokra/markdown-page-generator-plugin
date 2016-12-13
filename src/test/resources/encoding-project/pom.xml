@@ -19,6 +19,10 @@
     </dependencies>
 
     <build>
+
+        <!-- Added to keep everything out of the source tree -->
+        <directory>${project.basedir}/../../../../target/test-harness/encoding-project/target</directory>
+
         <plugins>
             <plugin>
                 <groupId>com.ruleoftech</groupId>
@@ -32,8 +36,6 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <inputDirectory>${basedir}/src/test/resources/encoding-project/src/main/resources/markdown</inputDirectory>
-                    <outputDirectory>${basedir}/target/test-harness/encoding-project/html</outputDirectory>
                     <pegdownExtensions>TABLES</pegdownExtensions>
                     <inputEncoding>UTF-8</inputEncoding>
                     <outputEncoding>ISO-8859-15</outputEncoding>

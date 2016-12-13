@@ -21,7 +21,7 @@
     <build>
 
         <!-- Added to keep everything out of the source tree -->
-        <directory>${project.basedir}/../../../../target/test-harness/timeout-project/target</directory>
+        <directory>${project.basedir}/../../../../target/test-harness/basic-project-custom-inout-directories/target</directory>
 
         <plugins>
             <plugin>
@@ -36,10 +36,9 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <inputDirectory>${basedir}/src/main/resources/markdown</inputDirectory>
-                    <outputDirectory>${project.build.directory}/html</outputDirectory>
+                    <inputDirectory>${basedir}/src/main/resources/markdown-renamed</inputDirectory>
+                    <outputDirectory>${project.build.directory}/html-renamed</outputDirectory>
                     <pegdownExtensions>TABLES</pegdownExtensions>
-                    <parsingTimeoutInMillis>0</parsingTimeoutInMillis>
                 </configuration>
             </plugin>
         </plugins>

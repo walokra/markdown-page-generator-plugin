@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ruleoftech.test</groupId>
-    <artifactId>basic</artifactId>
+    <artifactId>substitute-project</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Basic</name>
@@ -19,6 +19,10 @@
     </dependencies>
 
     <build>
+
+        <!-- Added to keep everything out of the source tree -->
+        <directory>${project.basedir}/../../../../target/test-harness/substitute-project/target</directory>
+
         <plugins>
             <plugin>
                 <groupId>com.ruleoftech</groupId>
@@ -32,10 +36,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <inputDirectory>${basedir}/src/test/resources/substitute-project/src/main/resources/markdown</inputDirectory>
-                    <outputDirectory>${basedir}/target/test-harness/substitute-project/html</outputDirectory>
-                    <headerHtmlFile>${basedir}/src/test/resources/substitute-project/src/main/resources/markdown/html/header.html</headerHtmlFile>
-                    <footerHtmlFile>${basedir}/src/test/resources/substitute-project/src/main/resources/markdown/html/footer.html</footerHtmlFile>
+                    <headerHtmlFile>${basedir}/src/main/resources/markdown/html/header.html</headerHtmlFile>
+                    <footerHtmlFile>${basedir}/src/main/resources/markdown/html/footer.html</footerHtmlFile>
                     <pegdownExtensions>TABLES</pegdownExtensions>
                 </configuration>
             </plugin>
