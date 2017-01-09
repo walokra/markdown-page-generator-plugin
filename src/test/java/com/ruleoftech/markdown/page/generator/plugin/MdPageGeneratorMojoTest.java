@@ -1,9 +1,6 @@
 package com.ruleoftech.markdown.page.generator.plugin;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.maven.execution.*;
-import org.apache.maven.plugin.testing.AbstractMojoTestCase;
-import org.apache.maven.project.*;
 import org.pegdown.ParsingTimeoutException;
 
 import java.io.File;
@@ -11,10 +8,8 @@ import java.io.File;
 /**
  * Unit test for {@link MdPageGeneratorMojo}
  */
-public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase
-{
-    public void testEncoding() throws Exception
-    {
+public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
+    public void testEncoding() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/encoding-project/target/html/README.html";
 
         // ensure this java-File will not be affected by
@@ -53,8 +48,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase
     }
 
     public void testBasicProject()
-            throws Exception
-    {
+            throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/basic-project/target/html/README.html";
 
         File pom = getTestFile("src/test/resources/basic-project/pom.xml");
@@ -69,8 +63,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase
         assertTrue("Expected HTML file does not exist: " + generatedMarkdown, generatedMarkdown.exists());
     }
 
-    public void testBasicProjectWithRenamedInOutDirectories() throws Exception
-    {
+    public void testBasicProjectWithRenamedInOutDirectories() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/basic-project-custom-inout-directories/target/html-renamed/README.html";
         final String notExpectedGeneratedHTMLFile = "/target/test-harness/basic-project-custom-inout-directories/target/html/README.html";
 
@@ -91,8 +84,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase
     }
 
     public void testBasicProjectExtension()
-            throws Exception
-    {
+            throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/basic-project-extension/target/html/README.html";
 
         File pom = getTestFile("src/test/resources/basic-project-extension/pom.xml");
@@ -113,8 +105,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase
     }
 
     public void testRecursiveProject()
-            throws Exception
-    {
+            throws Exception {
         final String expectedGeneratedHTMLFileBaseDir = "/target/test-harness/recursive-project/target/html/";
 
         File pom = getTestFile("src/test/resources/recursive-project/pom.xml");
@@ -139,8 +130,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase
     }
 
     public void testParsingTimeout()
-            throws Exception
-    {
+            throws Exception {
         File pom = getTestFile("src/test/resources/timeout-project/pom.xml");
         assertTrue(pom.exists());
 
@@ -148,19 +138,15 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase
 
         assertNotNull(mdPageGeneratorMojo);
 
-        try
-        {
+        try {
             mdPageGeneratorMojo.execute();
             fail();
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             assertEquals(ParsingTimeoutException.class, ex.getCause().getClass());
         }
     }
 
-    public void testSubstituteProject() throws Exception
-    {
+    public void testSubstituteProject() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/substitute-project/target/html/README.html";
 
         File pom = getTestFile("src/test/resources/substitute-project/pom.xml");
@@ -188,6 +174,5 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase
         assertTrue("Should contain the replaced Maven variable 'substitute-project'", html.contains("substitute-project"));
 
     }
-
 
 }

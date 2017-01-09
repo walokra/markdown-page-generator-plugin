@@ -25,8 +25,7 @@ import java.util.*;
  * Creates a static html from markdown files.
  */
 @Mojo(name = "generate")
-public class MdPageGeneratorMojo extends AbstractMojo
-{
+public class MdPageGeneratorMojo extends AbstractMojo {
 
     @Parameter(property = "generate.defaultTitle")
     private String defaultTitle;
@@ -82,7 +81,6 @@ public class MdPageGeneratorMojo extends AbstractMojo
     @Component
     protected MavenSession session;
 
-
     // Possible options
     // SMARTS: Beautifies apostrophes, ellipses ("..." and ". . .") and dashes ("--" and "---")
     // QUOTES: Beautifies single quotes, double quotes and double angle quotes (« and »)
@@ -99,21 +97,18 @@ public class MdPageGeneratorMojo extends AbstractMojo
     @Parameter(property = "generate.pegdownExtensions", defaultValue = "TABLES")
     private String pegdownExtensions;
 
-    private enum EPegdownExtensions
-    {
+    private enum EPegdownExtensions {
         NONE(0x00), SMARTS(0x01), QUOTES(0x02), SMARTYPANTS(EPegdownExtensions.SMARTS.getValue() + EPegdownExtensions.QUOTES.getValue()), ABBREVIATIONS(
-            0x04), HARDWRAPS(0x08), AUTOLINKS(0x10), TABLES(0x20), DEFINITIONS(0x40), FENCED_CODE_BLOCKS(0x80), WIKILINKS(0x100), ALL(
-            0x0000FFFF), SUPPRESS_HTML_BLOCKS(0x00010000), SUPPRESS_INLINE_HTML(0x00020000), SUPPRESS_ALL_HTML(0x00030000), ANCHORLINKS(0x400);
+                0x04), HARDWRAPS(0x08), AUTOLINKS(0x10), TABLES(0x20), DEFINITIONS(0x40), FENCED_CODE_BLOCKS(0x80), WIKILINKS(0x100), ALL(
+                0x0000FFFF), SUPPRESS_HTML_BLOCKS(0x00010000), SUPPRESS_INLINE_HTML(0x00020000), SUPPRESS_ALL_HTML(0x00030000), ANCHORLINKS(0x400);
 
         private final int value;
 
-        EPegdownExtensions(int value)
-        {
+        EPegdownExtensions(int value) {
             this.value = value;
         }
 
-        public int getValue()
-        {
+        public int getValue() {
             return value;
         }
 
@@ -136,11 +131,9 @@ public class MdPageGeneratorMojo extends AbstractMojo
      * @throws MojoExecutionException Something went wrong
      */
     @Override
-    public void execute() throws MojoExecutionException
-    {
+    public void execute() throws MojoExecutionException {
         // First, if filtering is enabled, perform that using the Maven magic
-        if (applyFiltering)
-        {
+        if (applyFiltering) {
             peformMavenPropertyFiltering(new File(inputDirectory), filteredOutputDiretory, getInputEncoding());
             inputDirectory = filteredOutputDiretory.getAbsolutePath();
         }
@@ -148,8 +141,7 @@ public class MdPageGeneratorMojo extends AbstractMojo
         getLog().info("Pre-processing markdown files from input directory: " + inputDirectory);
         preprocessMarkdownFiles(new File(inputDirectory));
 
-        if (!markdownDTOs.isEmpty())
-        {
+        if (!markdownDTOs.isEmpty()) {
             getLog().info("Process Pegdown extension options");
             int options = getPegdownExtensions(pegdownExtensions);
 
@@ -159,37 +151,25 @@ public class MdPageGeneratorMojo extends AbstractMojo
 
         // FIXME: This will possibly overwrite any filtering updates
         // FIXME: made in the maven property filtering step above
-        if (StringUtils.isNotEmpty(copyDirectories))
-        {
+        if (StringUtils.isNotEmpty(copyDirectories)) {
             getLog().info("Copy files from directories");
-            for (String dir : copyDirectories.split(","))
-            {
+            for (String dir : copyDirectories.split(",")) {
                 copyFiles(inputDirectory + File.separator + dir, outputDirectory + File.separator + dir);
             }
         }
-
-
     }
 
-    private int getPegdownExtensions(String extensions)
-    {
+    private int getPegdownExtensions(String extensions) {
         int options = 0;
-        for (String ext : Arrays.asList(extensions.split("\\s*,\\s*")))
-        {
-            try
-            {
-                if (!ext.isEmpty())
-                {
+        for (String ext : Arrays.asList(extensions.split("\\s*,\\s*"))) {
+            try {
+                if (!ext.isEmpty()) {
                     Field f = Extensions.class.getField(ext);
                     options |= f.getInt(null);
                 }
-            }
-            catch (NoSuchFieldException e)
-            {
+            } catch (NoSuchFieldException e) {
                 throw new IllegalArgumentException("No such extension: " + ext);
-            }
-            catch (IllegalAccessException e)
-            {
+            } catch (IllegalAccessException e) {
                 throw new IllegalArgumentException("Cannot read int value for extension " + ext + ": " + e, e);
             }
         }
@@ -197,7 +177,6 @@ public class MdPageGeneratorMojo extends AbstractMojo
         // getLog().info("Pegdown extension options = " + options);
 
         return options;
-
     }
 
     /**
@@ -207,14 +186,11 @@ public class MdPageGeneratorMojo extends AbstractMojo
      * Is there files to read
      * @throws MojoExecutionException Unable to load file
      */
-    private boolean preprocessMarkdownFiles(File inputDirectory) throws MojoExecutionException
-    {
+    private boolean preprocessMarkdownFiles(File inputDirectory) throws MojoExecutionException {
         getLog().debug("Read files from: " + inputDirectory);
 
-        try
-        {
-            if (!inputDirectory.exists())
-            {
+        try {
+            if (!inputDirectory.exists()) {
                 getLog().info("There is no input folder for the project. Skipping.");
                 return false;
             }
@@ -223,8 +199,7 @@ public class MdPageGeneratorMojo extends AbstractMojo
             // Reading just the markdown dir and sub dirs if recursive option set
             List<File> markdownFiles = getFilesAsArray(FileUtils.iterateFiles(inputDirectory, new String[]{inputFileExtension}, recursiveInput));
 
-            for (File file : markdownFiles)
-            {
+            for (File file : markdownFiles) {
                 getLog().debug("File getName() " + file.getName());
                 getLog().debug("File getAbsolutePath() " + file.getAbsolutePath());
                 getLog().debug("File getPath() " + file.getPath());
@@ -234,22 +209,16 @@ public class MdPageGeneratorMojo extends AbstractMojo
 
                 dto.folderDepth = StringUtils.countMatches(file.getAbsolutePath(), File.separator) - (baseDepth + 1);
 
-                if (alwaysUseDefaultTitle)
-                {
+                if (alwaysUseDefaultTitle) {
                     dto.title = defaultTitle;
-                }
-                else
-                {
+                } else {
                     List<String> raw = FileUtils.readLines(file, getInputEncoding());
                     dto.title = getTitle(raw);
                 }
 
-                if (applyFiltering)
-                {
-                    for (String line : FileUtils.readLines(file, getInputEncoding()))
-                    {
-                        if (isVariableLine(line))
-                        {
+                if (applyFiltering) {
+                    for (String line : FileUtils.readLines(file, getInputEncoding())) {
+                        if (isVariableLine(line)) {
                             String key = line.replaceAll("(^\\{)|(=.*)", "");
                             String value = line.replaceAll("(^\\{(.*?)=)|(\\}$)", "");
                             getLog().debug("Substitute: '" + key + "' -> '" + value + "'");
@@ -268,9 +237,7 @@ public class MdPageGeneratorMojo extends AbstractMojo
 
                 markdownDTOs.add(dto);
             }
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new MojoExecutionException("Unable to load file " + e.getMessage(), e);
         }
 
@@ -283,53 +250,40 @@ public class MdPageGeneratorMojo extends AbstractMojo
      *
      * @throws MojoExecutionException Unable to write file
      */
-    private void processMarkdown(List<MarkdownDTO> markdownDTOs, int options) throws MojoExecutionException
-    {
+    private void processMarkdown(List<MarkdownDTO> markdownDTOs, int options) throws MojoExecutionException {
         getLog().debug("Process Markdown");
         getLog().debug("inputEncoding: '" + getInputEncoding() + "', outputEncoding: '" + getOutputEncoding() + "'");
         getLog().debug("parsingTimeout: " + getParsingTimeoutInMillis() + " ms");
         getLog().debug("applyFiltering: " + applyFiltering);
 
-        for (MarkdownDTO dto : markdownDTOs)
-        {
+        for (MarkdownDTO dto : markdownDTOs) {
             getLog().debug("dto: " + dto);
 
-            try
-            {
+            try {
                 String headerHtml = "";
                 String footerHtml = "";
 
-                try
-                {
-                    if (StringUtils.isNotEmpty(headerHtmlFile))
-                    {
+                try {
+                    if (StringUtils.isNotEmpty(headerHtmlFile)) {
                         headerHtml = FileUtils.readFileToString(new File(headerHtmlFile), getInputEncoding());
                         headerHtml = addTitleToHtmlFile(headerHtml, dto.title);
                         headerHtml = replaceVariables(headerHtml, dto.substitutes);
                         headerHtml = updateRelativePaths(headerHtml, dto.folderDepth);
                     }
-                    if (StringUtils.isNotEmpty(footerHtmlFile))
-                    {
+                    if (StringUtils.isNotEmpty(footerHtmlFile)) {
                         footerHtml = FileUtils.readFileToString(new File(footerHtmlFile), getInputEncoding());
                         footerHtml = replaceVariables(footerHtml, dto.substitutes);
                         footerHtml = updateRelativePaths(footerHtml, dto.folderDepth);
                     }
-                }
-                catch (FileNotFoundException e)
-                {
-                    if (failIfFilesAreMissing)
-                    {
+                } catch (FileNotFoundException e) {
+                    if (failIfFilesAreMissing) {
                         throw e;
-                    }
-                    else
-                    {
+                    } else {
                         getLog().warn("header and/or footer file is missing.");
                         headerHtml = "";
                         footerHtml = "";
                     }
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     throw new MojoExecutionException("Error while processing header/footer: " + e.getMessage(), e);
                 }
 
@@ -339,12 +293,9 @@ public class MdPageGeneratorMojo extends AbstractMojo
 
                 PegDownProcessor pegDownProcessor = new PegDownProcessor(options, getParsingTimeoutInMillis());
                 String markdownAsHtml;
-                if (transformRelativeMarkdownLinks)
-                {
+                if (transformRelativeMarkdownLinks) {
                     markdownAsHtml = pegDownProcessor.markdownToHtml(markdown, new MDToHTMLExpLinkRender(inputFileExtension));
-                }
-                else
-                {
+                } else {
                     markdownAsHtml = pegDownProcessor.markdownToHtml(markdown);
                 }
                 StringBuilder data = new StringBuilder();
@@ -353,52 +304,37 @@ public class MdPageGeneratorMojo extends AbstractMojo
                 data.append(footerHtml);
 
                 FileUtils.writeStringToFile(dto.htmlFile, data.toString(), getOutputEncoding());
-            }
-            catch (MojoExecutionException e)
-            {
+            } catch (MojoExecutionException e) {
                 throw e;
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 getLog().error("Error : " + e.getMessage(), e);
                 throw new MojoExecutionException("Unable to write file " + e.getMessage(), e);
             }
         }
     }
 
-    private String getInputEncoding()
-    {
-        if (StringUtils.isBlank(inputEncoding))
-        {
+    private String getInputEncoding() {
+        if (StringUtils.isBlank(inputEncoding)) {
             return Charset.defaultCharset().name();
-        }
-        else
-        {
+        } else {
             return inputEncoding;
         }
     }
 
-    private String getOutputEncoding()
-    {
-        if (StringUtils.isBlank(outputEncoding))
-        {
+    private String getOutputEncoding() {
+        if (StringUtils.isBlank(outputEncoding)) {
             return Charset.defaultCharset().name();
-        }
-        else
-        {
+        } else {
             return outputEncoding;
         }
     }
 
-    public String getInputFileExtension()
-    {
+    public String getInputFileExtension() {
         return inputFileExtension;
     }
 
-    private long getParsingTimeoutInMillis()
-    {
-        if (parsingTimeoutInMillis != null)
-        {
+    private long getParsingTimeoutInMillis() {
+        if (parsingTimeoutInMillis != null) {
             return parsingTimeoutInMillis;
         }
 
@@ -411,18 +347,14 @@ public class MdPageGeneratorMojo extends AbstractMojo
      * @param raw The markdown as a list of strings
      * @return The first # h1 in the Markdown file
      */
-    private String getTitle(List<String> raw)
-    {
-        if (raw == null)
-        {
+    private String getTitle(List<String> raw) {
+        if (raw == null) {
             return defaultTitle;
         }
         String previousLine = "";
-        for (String line : raw)
-        {
+        for (String line : raw) {
             line = line.trim();
-            if (line.startsWith("#"))
-            {
+            if (line.startsWith("#")) {
                 line = line.replace("#", "");
                 return line;
             }
@@ -434,8 +366,7 @@ public class MdPageGeneratorMojo extends AbstractMojo
             //
             //If there is a match we consider the previous line to be the title.
             if ((line.startsWith("=") && StringUtils.countMatches(line, "=") == previousLine.length() && line.matches("^=+$"))
-                    || (line.startsWith("-") && StringUtils.countMatches(line, "-") == previousLine.length() && line.matches("^-+$")))
-            {
+                    || (line.startsWith("-") && StringUtils.countMatches(line, "-") == previousLine.length() && line.matches("^-+$"))) {
                 return previousLine;
             }
             previousLine = line;
@@ -449,19 +380,14 @@ public class MdPageGeneratorMojo extends AbstractMojo
      * @param html  The HTML string
      * @param title The title
      */
-    private String addTitleToHtmlFile(String html, String title)
-    {
-        if (html == null)
-        {
+    private String addTitleToHtmlFile(String html, String title) {
+        if (html == null) {
             return html;
         }
-        if (title != null)
-        {
+        if (title != null) {
             getLog().debug("Setting the title in the HTML file to: " + title);
             return html.replaceFirst("titleToken", title);
-        }
-        else
-        {
+        } else {
             getLog().debug("Title was null, setting the title in the HTML file to an empty string");
             return html.replaceFirst("titleToken", "");
         }
@@ -474,18 +400,14 @@ public class MdPageGeneratorMojo extends AbstractMojo
      * @param variables
      * @return the updated html
      */
-    private String replaceVariables(String initialContent, Map<String, String> variables)
-    {
+    private String replaceVariables(String initialContent, Map<String, String> variables) {
         String newContent = initialContent;
         // Only apply substitution if filtering is enabled and there is actually something to
         // substitute, otherwise just return the original content.
-        if (applyFiltering && newContent != null)
-        {
+        if (applyFiltering && newContent != null) {
             newContent = newContent.replaceAll("(\\{.*=.*\\}?)", "");
-            if (variables != null)
-            {
-                for (Map.Entry<String, String> substitute : variables.entrySet())
-                {
+            if (variables != null) {
+                for (Map.Entry<String, String> substitute : variables.entrySet()) {
                     newContent = newContent.replace("${" + substitute.getKey() + "}", substitute.getValue());
                 }
             }
@@ -494,8 +416,7 @@ public class MdPageGeneratorMojo extends AbstractMojo
         return newContent;
     }
 
-    private static boolean isVariableLine(String line)
-    {
+    private static boolean isVariableLine(String line) {
         return line.matches("^\\{.*=.*\\}$");
     }
 
@@ -506,10 +427,8 @@ public class MdPageGeneratorMojo extends AbstractMojo
      * @param html        The HTML string
      * @param folderDepth Current markdown file's folder depth
      */
-    private String updateRelativePaths(String html, int folderDepth)
-    {
-        if (html == null)
-        {
+    private String updateRelativePaths(String html, int folderDepth) {
+        if (html == null) {
             return html;
         }
         getLog().debug("Updating relative paths in html includes (css, js).");
@@ -521,17 +440,14 @@ public class MdPageGeneratorMojo extends AbstractMojo
      *
      * @param folderDepth Current markdown file's folder depth
      */
-    private String getSiteBasePrefix(int folderDepth)
-    {
+    private String getSiteBasePrefix(int folderDepth) {
         String pathToBase = ".";
-        while (folderDepth > 0)
-        {
+        while (folderDepth > 0) {
             pathToBase += "/..";
             folderDepth--;
         }
         return pathToBase;
     }
-
 
     /**
      * Copy files from one dir to another based on file extensions.
@@ -540,40 +456,29 @@ public class MdPageGeneratorMojo extends AbstractMojo
      * @param toDir   the directory to copy to
      * @throws MojoExecutionException Unable to copy file
      */
-    private void copyFiles(String fromDir, String toDir) throws MojoExecutionException
-    {
+    private void copyFiles(String fromDir, String toDir) throws MojoExecutionException {
         getLog().debug("fromDir=" + fromDir + "; toDir=" + toDir);
-        try
-        {
+        try {
             File fromDirFile = new File(fromDir);
-            if (fromDirFile.exists())
-            {
+            if (fromDirFile.exists()) {
                 Iterator<File> files = FileUtils.iterateFiles(new File(fromDir), null, false);
-                while (files.hasNext())
-                {
+                while (files.hasNext()) {
                     File file = files.next();
-                    if (file.exists())
-                    {
+                    if (file.exists()) {
                         FileUtils.copyFileToDirectory(file, new File(toDir));
-                    }
-                    else
-                    {
+                    } else {
                         getLog().error("File '" + file.getAbsolutePath() + "' does not exist. Skipping copy");
                     }
                 }
             }
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new MojoExecutionException("Unable to copy file " + e.getMessage(), e);
         }
     }
 
-    private List<File> getFilesAsArray(Iterator<File> iterator)
-    {
+    private List<File> getFilesAsArray(Iterator<File> iterator) {
         List<File> files = new ArrayList<File>();
-        while (iterator.hasNext())
-        {
+        while (iterator.hasNext()) {
             files.add(iterator.next());
         }
         return files;
@@ -582,8 +487,7 @@ public class MdPageGeneratorMojo extends AbstractMojo
     /**
      * Store information about markdown file.
      */
-    private class MarkdownDTO
-    {
+    private class MarkdownDTO {
         public String title;
         public Map<String, String> substitutes = new HashMap<String, String>();
         public File htmlFile;
@@ -592,13 +496,15 @@ public class MdPageGeneratorMojo extends AbstractMojo
     }
 
 
-    /** MAVEN RESOURCE FILTERING: Heavily borrowed from Apache Maven ResourcesMojo (https://maven.apache.org/plugins/maven-resources-plugin) **/
+    /**
+     * MAVEN RESOURCE FILTERING: Heavily borrowed from Apache Maven ResourcesMojo (https://maven.apache.org/plugins/maven-resources-plugin)
+     **/
 
     private List<MavenResourcesFiltering> mavenFilteringComponents = new ArrayList<MavenResourcesFiltering>();
     private PlexusContainer plexusContainer;
     private List<String> mavenFilteringHints;
 
-    @Component( role = MavenResourcesFiltering.class, hint = "default" )
+    @Component(role = MavenResourcesFiltering.class, hint = "default")
     protected MavenResourcesFiltering mavenResourcesFiltering;
 
     @Parameter
@@ -631,18 +537,15 @@ public class MdPageGeneratorMojo extends AbstractMojo
      *
      * @since 3.0.0
      */
-    @Parameter( defaultValue = "true" )
+    @Parameter(defaultValue = "true")
     protected boolean addDefaultExcludes;
 
-    public void contextualize(Context context) throws ContextException
-    {
+    public void contextualize(Context context) throws ContextException {
         plexusContainer = (PlexusContainer) context.get(PlexusConstants.PLEXUS_KEY);
     }
 
-    private void peformMavenPropertyFiltering(final File inputDirectory, final File outputDirectory, final String inputEncoding) throws MojoExecutionException
-    {
-        try
-        {
+    private void peformMavenPropertyFiltering(final File inputDirectory, final File outputDirectory, final String inputEncoding) throws MojoExecutionException {
+        try {
             List<String> combinedFilters = getCombinedFiltersList();
 
             List<Resource> resources = new ArrayList<Resource>();
@@ -673,8 +576,7 @@ public class MdPageGeneratorMojo extends AbstractMojo
             // if these are NOT set, just use the defaults, which are '${*}' and '@'.
             // mavenResourcesExecution.setDelimiters(delimiters, useDefaultDelimiters);
 
-            if (nonFilteredFileExtensions != null)
-            {
+            if (nonFilteredFileExtensions != null) {
                 mavenResourcesExecution.setNonFilteredFileExtensions(nonFilteredFileExtensions);
             }
 
@@ -683,12 +585,9 @@ public class MdPageGeneratorMojo extends AbstractMojo
             executeUserFilterComponents(mavenResourcesExecution);
 
             mavenResourcesExecution.getOutputDirectory();
+        } catch (MavenFilteringException e) {
+            throw new MojoExecutionException("Failure while processing/fitering markdown sources: " + e.getMessage(), e);
         }
-        catch (MavenFilteringException e)
-        {
-            throw new MojoExecutionException("Failure while processing/fitering markdown sources: " + e.getMessage(),e);
-        }
-
     }
 
     /**
@@ -699,20 +598,18 @@ public class MdPageGeneratorMojo extends AbstractMojo
      * can't be found in the context which can be got from the maven core.<br/>
      * A solution could be to put those values into the context by Maven core so they are accessible everywhere. (I'm
      * not sure if this is a good idea). Better ideas are always welcome.
-     *
+     * <p>
      * The problem at the moment is that maven core handles usage of properties and replacements in
      * the model, but does not the resource filtering which needed some of the properties.
      *
      * @return the new instance with those properties.
      */
-    private Properties addSeveralSpecialProperties()
-    {
-        String timeStamp = new MavenBuildTimestamp(new Date(),timestampFormat).formattedTimestamp();
+    private Properties addSeveralSpecialProperties() {
+        String timeStamp = new MavenBuildTimestamp(new Date(), timestampFormat).formattedTimestamp();
         Properties additionalProperties = new Properties();
-        additionalProperties.put( "mdpagegenerator.timestamp", timeStamp );
-        if ( project.getBasedir() != null )
-        {
-            additionalProperties.put( "project.baseUri", project.getBasedir().getAbsoluteFile().toURI().toString() );
+        additionalProperties.put("mdpagegenerator.timestamp", timeStamp);
+        if (project.getBasedir() != null) {
+            additionalProperties.put("project.baseUri", project.getBasedir().getAbsoluteFile().toURI().toString());
         }
 
         return additionalProperties;
@@ -720,41 +617,31 @@ public class MdPageGeneratorMojo extends AbstractMojo
 
     /**
      * @param mavenResourcesExecution {@link MavenResourcesExecution}
-     * @throws MojoExecutionException in case of wrong lookup.
+     * @throws MojoExecutionException  in case of wrong lookup.
      * @throws MavenFilteringException in case of failure.
      * @since 2.5
      */
-    protected void executeUserFilterComponents( MavenResourcesExecution mavenResourcesExecution )
-        throws MojoExecutionException, MavenFilteringException
-    {
+    protected void executeUserFilterComponents(MavenResourcesExecution mavenResourcesExecution)
+            throws MojoExecutionException, MavenFilteringException {
 
-        if ( mavenFilteringHints != null )
-        {
-            for ( String hint : mavenFilteringHints )
-            {
-                try
-                {
+        if (mavenFilteringHints != null) {
+            for (String hint : mavenFilteringHints) {
+                try {
                     // CHECKSTYLE_OFF: LineLength
-                    mavenFilteringComponents.add( (MavenResourcesFiltering) plexusContainer.lookup( MavenResourcesFiltering.class.getName(), hint ) );
+                    mavenFilteringComponents.add((MavenResourcesFiltering) plexusContainer.lookup(MavenResourcesFiltering.class.getName(), hint));
                     // CHECKSTYLE_ON: LineLength
-                }
-                catch ( ComponentLookupException e )
-                {
-                    throw new MojoExecutionException( e.getMessage(), e );
+                } catch (ComponentLookupException e) {
+                    throw new MojoExecutionException(e.getMessage(), e);
                 }
             }
-        }
-        else
-        {
-            getLog().debug( "no use filter components" );
+        } else {
+            getLog().debug("no use filter components");
         }
 
-        if ( mavenFilteringComponents != null && !mavenFilteringComponents.isEmpty() )
-        {
-            getLog().debug( "execute user filters" );
-            for ( MavenResourcesFiltering filter : mavenFilteringComponents )
-            {
-                filter.filterResources( mavenResourcesExecution );
+        if (mavenFilteringComponents != null && !mavenFilteringComponents.isEmpty()) {
+            getLog().debug("execute user filters");
+            for (MavenResourcesFiltering filter : mavenFilteringComponents) {
+                filter.filterResources(mavenResourcesExecution);
             }
         }
     }
@@ -762,7 +649,7 @@ public class MdPageGeneratorMojo extends AbstractMojo
     @Parameter
     protected List<String> filters;
 
-    @Parameter( defaultValue = "true" )
+    @Parameter(defaultValue = "true")
     protected boolean useBuildFilters;
 
     @Parameter(defaultValue = "${project.build.filters}", readonly = true)
@@ -771,26 +658,20 @@ public class MdPageGeneratorMojo extends AbstractMojo
     /**
      * @return The combined filters.
      */
-    protected List<String> getCombinedFiltersList()
-    {
-        if ( filters == null || filters.isEmpty() )
-        {
+    protected List<String> getCombinedFiltersList() {
+        if (filters == null || filters.isEmpty()) {
             return useBuildFilters ? buildFilters : null;
-        }
-        else
-        {
+        } else {
             List<String> result = new ArrayList<String>();
 
-            if ( useBuildFilters && buildFilters != null && !buildFilters.isEmpty() )
-            {
-                result.addAll( buildFilters );
+            if (useBuildFilters && buildFilters != null && !buildFilters.isEmpty()) {
+                result.addAll(buildFilters);
             }
 
-            result.addAll( filters );
+            result.addAll(filters);
 
             return result;
         }
     }
-
 
 }
