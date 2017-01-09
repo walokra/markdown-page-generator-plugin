@@ -162,17 +162,19 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
 
         String html = FileUtils.readFileToString(generatedMarkdown);
 
-        assertFalse("Shouldn't contains the var declaration", html.contains("headerSubstitution"));
-        assertFalse("Shouldn't contains the var declaration", html.contains("footerSubstitution"));
+        assertFalse("Shouldn't contain the var declaration", html.contains("headerSubstitution"));
+        assertFalse("Shouldn't contain the var declaration", html.contains("footerSubstitution"));
 
-        assertFalse("Shouldn't contains the original var", html.contains("${headerSubstitution}"));
-        assertFalse("Shouldn't contains the original var", html.contains("${footerSubstitution}"));
+        assertFalse("Shouldn't contain the original var", html.contains("${headerSubstitution}"));
+        assertFalse("Shouldn't contain the original var", html.contains("${footerSubstitution}"));
 
-        assertTrue("Should contains the replaced var", html.contains("The new header"));
-        assertTrue("Should contains the replaced var", html.contains("The new footer"));
+        assertTrue("Should contain the replaced var", html.contains("The new header"));
+        assertTrue("Should contain the replaced var", html.contains("The new footer"));
 
         assertTrue("Should contain the replaced Maven variable 'substitute-project'", html.contains("substitute-project"));
 
+        assertTrue("Should contain the original var 'beanId'", html.contains("${beanId}"));
+        assertTrue("Should contain the original var 'cacheManager'", html.contains("${cacheManager}"));
     }
 
 }

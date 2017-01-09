@@ -20,6 +20,8 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Creates a static html from markdown files.
@@ -230,7 +232,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
                     for (String line : FileUtils.readLines(file, getInputEncoding())) {
                         if (isVariableLine(line)) {
                             String key = line.replaceAll("(^\\{)|(=.*)", "");
-                            String value = line.replaceAll("(^\\{(.*?)=)|(\\}$)", "");
+                            String value = line.replaceAll("(^\\{(.*?)=)|(}$)", "");
                             getLog().debug("Substitute: '" + key + "' -> '" + value + "'");
                             dto.substitutes.put(key, value);
                         }
@@ -252,6 +254,29 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         }
 
         return true;
+    }
+
+    /**
+     * Replace variables with given pattern.
+     *
+     * @param template  String to replace
+     * @param patternString regexp pattern
+     * @param variables variables to find
+     * @return
+     */
+    private String substituteVariables(String template, String patternString, Map<String, String> variables) {
+        Pattern pattern = Pattern.compile(patternString);
+        Matcher matcher = pattern.matcher(template);
+        StringBuffer buffer = new StringBuffer();
+        while (matcher.find()) {
+            if (variables.containsKey(matcher.group(1))) {
+                String replacement = variables.get(matcher.group(1));
+                // quote to work properly with $ and {,} signs
+                matcher.appendReplacement(buffer, replacement != null ? Matcher.quoteReplacement(replacement) : "null");
+            }
+        }
+        matcher.appendTail(buffer);
+        return buffer.toString();
     }
 
     /**
@@ -415,11 +440,9 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         // Only apply substitution if filtering is enabled and there is actually something to
         // substitute, otherwise just return the original content.
         if (applyFiltering && newContent != null) {
-            newContent = newContent.replaceAll("(\\{.*=.*\\}?)", "");
+            newContent = newContent.replaceAll("\\{\\w*=.*}", "");
             if (variables != null) {
-                for (Map.Entry<String, String> substitute : variables.entrySet()) {
-                    newContent = newContent.replace("${" + substitute.getKey() + "}", substitute.getValue());
-                }
+                newContent = substituteVariables(newContent, "\\$\\{(.+?)\\}", variables);
             }
         }
 
