@@ -84,7 +84,6 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     // Possible options
     // SMARTS: Beautifies apostrophes, ellipses ("..." and ". . .") and dashes ("--" and "---")
     // QUOTES: Beautifies single quotes, double quotes and double angle quotes (« and »)
-    // SMARTYPANTS: Convenience extension enabling both, SMARTS and QUOTES, at once.
     // ABBREVIATIONS: Abbreviations in the way of PHP Markdown Extra.
     // HARDWRAPS: Alternative handling of newlines, see Github-flavoured-Markdown
     // AUTOLINKS: Plain (undelimited) autolinks the way Github-flavoured-Markdown implements them.
@@ -98,9 +97,21 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     private String pegdownExtensions;
 
     private enum EPegdownExtensions {
-        NONE(0x00), SMARTS(0x01), QUOTES(0x02), SMARTYPANTS(EPegdownExtensions.SMARTS.getValue() + EPegdownExtensions.QUOTES.getValue()), ABBREVIATIONS(
-                0x04), HARDWRAPS(0x08), AUTOLINKS(0x10), TABLES(0x20), DEFINITIONS(0x40), FENCED_CODE_BLOCKS(0x80), WIKILINKS(0x100), ALL(
-                0x0000FFFF), SUPPRESS_HTML_BLOCKS(0x00010000), SUPPRESS_INLINE_HTML(0x00020000), SUPPRESS_ALL_HTML(0x00030000), ANCHORLINKS(0x400);
+        NONE(0x00),
+        SMARTS(0x01),
+        QUOTES(0x02),
+        ABBREVIATIONS(0x04),
+        HARDWRAPS(0x08),
+        AUTOLINKS(0x10),
+        TABLES(0x20),
+        DEFINITIONS(0x40),
+        FENCED_CODE_BLOCKS(0x80),
+        WIKILINKS(0x100),
+        ALL(0x0000FFFF),
+        SUPPRESS_HTML_BLOCKS(0x00010000),
+        SUPPRESS_INLINE_HTML(0x00020000),
+        SUPPRESS_ALL_HTML(0x00030000),
+        ANCHORLINKS(0x400);
 
         private final int value;
 
@@ -149,8 +160,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
             processMarkdown(markdownDTOs, options);
         }
 
-        // FIXME: This will possibly overwrite any filtering updates
-        // FIXME: made in the maven property filtering step above
+        // FIXME: This will possibly overwrite any filtering updates made in the maven property filtering step above
         if (StringUtils.isNotEmpty(copyDirectories)) {
             getLog().info("Copy files from directories");
             for (String dir : copyDirectories.split(",")) {
