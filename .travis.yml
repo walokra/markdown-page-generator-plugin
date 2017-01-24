@@ -1,1 +1,8 @@
 language: java
+
+jdk:
+  - oraclejdk6
+
+env:
+  - TEST=java
+
