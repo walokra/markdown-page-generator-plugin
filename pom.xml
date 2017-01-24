@@ -2,13 +2,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ruleoftech</groupId>
+    <groupId>com.vladsch.flexmark</groupId>
     <artifactId>markdown-page-generator-plugin</artifactId>
-    <version>0.12-SNAPSHOT</version>
+    <version>0.12.3</version>
     <packaging>maven-plugin</packaging>
     <name>Markdown Page Generator Maven Plugin</name>
     <description>Markdown to HTML Page Generator Maven Plugin</description>
-    <url>http://ruleoftech.com/lab</url>
+    <url>https://github.com/vsch/markdown-page-generator-plugin</url>
 
     <licenses>
         <license>
@@ -20,15 +20,21 @@
 
     <developers>
         <developer>
+            <name>Vladimir Schneider</name>
+            <email>vladimir@vladsch.com</email>
+            <organization>vladsch.com</organization>
+            <organizationUrl>https://vladsch.com/</organizationUrl>
+        </developer>
+        <developer>
             <name>Marko Wallin</name>
             <email>marko.wallink@iki.fi</email>
         </developer>
     </developers>
 
     <scm>
-        <url>git@github.com:walokra/markdown-page-generator-plugin.git</url>
-        <connection>scm:git:git@github.com:walokra/markdown-page-generator-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:walokra/markdown-page-generator-plugin.git</developerConnection>
+        <url>git@github.com:vsch/markdown-page-generator-plugin.git</url>
+        <connection>scm:git:git@github.com:vsch/markdown-page-generator-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:vsch/markdown-page-generator-plugin.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
@@ -61,9 +67,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.pegdown</groupId>
-            <artifactId>pegdown</artifactId>
-            <version>1.6.0</version>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-profile-pegdown</artifactId>
+            <version>0.12.3</version>
         </dependency>
 
         <!-- Maven plugin testing -->
@@ -104,46 +110,25 @@
     </distributionManagement>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5.3</version>
-                    <configuration>
-                        <useReleaseProfile>false</useReleaseProfile>
-                        <releaseProfiles>release</releaseProfiles>
-                        <goals>deploy</goals>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
         <plugins>
             <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.7</version>
-                <extensions>true</extensions>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.3</version>
                 <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                    <generateBackupPoms>false</generateBackupPoms>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-plugin-plugin</artifactId>
-                <version>3.5</version>
-                <configuration>
-                    <!-- see http://jira.codehaus.org/browse/MNG-5346 -->
-                    <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-                </configuration>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
                 <executions>
                     <execution>
-                        <id>mojo-descriptor</id>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
                         <goals>
-                            <goal>descriptor</goal>
+                            <goal>sign</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -151,19 +136,71 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.5.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>7</source>
+                    <target>7</target>
                 </configuration>
             </plugin>
             <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.1</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>package-sources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>package-javadoc</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>deploy-to-sonatype</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy</goal>
+                            <!--
+                                                            <goal>release</goal>
+                            -->
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
 
+<!--
     <profiles>
         <profile>
             <id>release</id>
@@ -213,5 +250,6 @@
             </build>
         </profile>
     </profiles>
+-->
 
 </project>

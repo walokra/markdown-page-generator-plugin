@@ -1,7 +1,6 @@
-package com.ruleoftech.markdown.page.generator.plugin;
+package com.vladsch.flexmark.page.generator.plugin;
 
 import org.apache.commons.io.FileUtils;
-import org.pegdown.ParsingTimeoutException;
 
 import java.io.File;
 
@@ -129,22 +128,22 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         assertTrue(page11.exists());
     }
 
-    public void testParsingTimeout()
-            throws Exception {
-        File pom = getTestFile("src/test/resources/timeout-project/pom.xml");
-        assertTrue(pom.exists());
-
-        MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
-
-        assertNotNull(mdPageGeneratorMojo);
-
-        try {
-            mdPageGeneratorMojo.execute();
-            fail();
-        } catch (Exception ex) {
-            assertEquals(ParsingTimeoutException.class, ex.getCause().getClass());
-        }
-    }
+    //public void testParsingTimeout()
+    //        throws Exception {
+    //    File pom = getTestFile("src/test/resources/timeout-project/pom.xml");
+    //    assertTrue(pom.exists());
+    //
+    //    MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
+    //
+    //    assertNotNull(mdPageGeneratorMojo);
+    //
+    //    try {
+    //        mdPageGeneratorMojo.execute();
+    //        fail();
+    //    } catch (Exception ex) {
+    //        assertEquals(ParsingTimeoutException.class, ex.getCause().getClass());
+    //    }
+    //}
 
     public void testSubstituteProject() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/substitute-project/target/html/README.html";

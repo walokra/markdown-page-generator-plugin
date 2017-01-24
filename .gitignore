@@ -10,3 +10,4 @@ release.properties
 .idea
 *.iml
 
+/pom.xml.versionsBackup

@@ -1,22 +1,35 @@
-package com.ruleoftech.markdown.page.generator.plugin;
+package com.vladsch.flexmark.page.generator.plugin;
 
+import com.vladsch.flexmark.Extension;
+import com.vladsch.flexmark.ast.Node;
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.profiles.pegdown.Extensions;
+import com.vladsch.flexmark.profiles.pegdown.PegdownOptionsAdapter;
+import com.vladsch.flexmark.util.options.MutableDataHolder;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.interpolation.MavenBuildTimestamp;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.*;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.filtering.*;
-import org.codehaus.plexus.*;
+import org.apache.maven.shared.filtering.MavenFilteringException;
+import org.apache.maven.shared.filtering.MavenResourcesExecution;
+import org.apache.maven.shared.filtering.MavenResourcesFiltering;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.*;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.util.StringUtils;
-import org.pegdown.Extensions;
-import org.pegdown.PegDownProcessor;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -99,21 +112,40 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     private String pegdownExtensions;
 
     private enum EPegdownExtensions {
-        NONE(0x00),
-        SMARTS(0x01),
-        QUOTES(0x02),
-        ABBREVIATIONS(0x04),
-        HARDWRAPS(0x08),
-        AUTOLINKS(0x10),
-        TABLES(0x20),
-        DEFINITIONS(0x40),
-        FENCED_CODE_BLOCKS(0x80),
-        WIKILINKS(0x100),
-        ALL(0x0000FFFF),
-        SUPPRESS_HTML_BLOCKS(0x00010000),
-        SUPPRESS_INLINE_HTML(0x00020000),
-        SUPPRESS_ALL_HTML(0x00030000),
-        ANCHORLINKS(0x400);
+        NONE(Extensions.NONE),
+        SMARTS(Extensions.SMARTS),
+        QUOTES(Extensions.QUOTES),
+        SMARTYPANTS(Extensions.SMARTYPANTS),
+        ABBREVIATIONS(Extensions.ABBREVIATIONS),
+        HARDWRAPS(Extensions.HARDWRAPS),
+        AUTOLINKS(Extensions.AUTOLINKS),
+        TABLES(Extensions.TABLES),
+        DEFINITIONS(Extensions.DEFINITIONS),
+        FENCED_CODE_BLOCKS(Extensions.FENCED_CODE_BLOCKS),
+        WIKILINKS(Extensions.WIKILINKS),
+        STRIKETHROUGH(Extensions.STRIKETHROUGH),
+        ANCHORLINKS(Extensions.ANCHORLINKS),
+        ALL(Extensions.ALL),
+        SUPPRESS_HTML_BLOCKS(Extensions.SUPPRESS_HTML_BLOCKS),
+        SUPPRESS_INLINE_HTML(Extensions.SUPPRESS_INLINE_HTML),
+        SUPPRESS_ALL_HTML(Extensions.SUPPRESS_ALL_HTML),
+        ATXHEADERSPACE(Extensions.ATXHEADERSPACE),
+        SUBSCRIPT(Extensions.SUBSCRIPT),
+        RELAXEDHRULES(Extensions.RELAXEDHRULES),
+        TASKLISTITEMS(Extensions.TASKLISTITEMS),
+        EXTANCHORLINKS(Extensions.EXTANCHORLINKS),
+        EXTANCHORLINKS_WRAP(Extensions.EXTANCHORLINKS_WRAP),
+        FOOTNOTES(Extensions.FOOTNOTES),
+        TOC(Extensions.TOC),
+        MULTI_LINE_IMAGE_URLS(Extensions.MULTI_LINE_IMAGE_URLS),
+        SUPERSCRIPT(Extensions.SUPERSCRIPT),
+        FORCELISTITEMPARA(Extensions.FORCELISTITEMPARA),
+        INSERTED(Extensions.INSERTED),
+        ALL_OPTIONALS(Extensions.ALL_OPTIONALS),
+        ALL_WITH_OPTIONALS(Extensions.ALL_WITH_OPTIONALS),
+        GITHUB_DOCUMENT_COMPATIBLE(Extensions.GITHUB_DOCUMENT_COMPATIBLE),
+        GITHUB_WIKI_COMPATIBLE(Extensions.GITHUB_WIKI_COMPATIBLE),
+        GITHUB_COMMENT_COMPATIBLE(Extensions.GITHUB_COMMENT_COMPATIBLE);
 
         private final int value;
 
@@ -124,7 +156,6 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         public int getValue() {
             return value;
         }
-
     }
 
     /**
@@ -147,7 +178,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException {
         // First, if filtering is enabled, perform that using the Maven magic
         if (applyFiltering) {
-            peformMavenPropertyFiltering(new File(inputDirectory), filteredOutputDiretory, getInputEncoding());
+            performMavenPropertyFiltering(new File(inputDirectory), filteredOutputDiretory, getInputEncoding());
             inputDirectory = filteredOutputDiretory.getAbsolutePath();
         }
 
@@ -198,6 +229,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
      * Is there files to read
      * @throws MojoExecutionException Unable to load file
      */
+    @SuppressWarnings("UnusedReturnValue")
     private boolean preprocessMarkdownFiles(File inputDirectory) throws MojoExecutionException {
         getLog().debug("Read files from: " + inputDirectory);
 
@@ -209,7 +241,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
             int baseDepth = StringUtils.countMatches(inputDirectory.getAbsolutePath(), File.separator);
 
             // Reading just the markdown dir and sub dirs if recursive option set
-            List<File> markdownFiles = getFilesAsArray(FileUtils.iterateFiles(inputDirectory, new String[]{inputFileExtension}, recursiveInput));
+            List<File> markdownFiles = getFilesAsArray(FileUtils.iterateFiles(inputDirectory, new String[] { inputFileExtension }, recursiveInput));
 
             for (File file : markdownFiles) {
                 getLog().debug("File getName() " + file.getName());
@@ -259,10 +291,10 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     /**
      * Replace variables with given pattern.
      *
-     * @param template  String to replace
+     * @param template      String to replace
      * @param patternString regexp pattern
-     * @param variables variables to find
-     * @return
+     * @param variables     variables to find
+     * @return result
      */
     private String substituteVariables(String template, String patternString, Map<String, String> variables) {
         Pattern pattern = Pattern.compile(patternString);
@@ -288,8 +320,22 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     private void processMarkdown(List<MarkdownDTO> markdownDTOs, int options) throws MojoExecutionException {
         getLog().debug("Process Markdown");
         getLog().debug("inputEncoding: '" + getInputEncoding() + "', outputEncoding: '" + getOutputEncoding() + "'");
-        getLog().debug("parsingTimeout: " + getParsingTimeoutInMillis() + " ms");
+        //getLog().debug("parsingTimeout: " + getParsingTimeoutInMillis() + " ms");
         getLog().debug("applyFiltering: " + applyFiltering);
+
+        MutableDataHolder flexmarkOptions = PegdownOptionsAdapter.flexmarkOptions(options).toMutable();
+        if (transformRelativeMarkdownLinks) {
+            flexmarkOptions.set(PageGeneratorExtension.INPUT_FILE_EXTENSION, inputFileExtension);
+            ArrayList<Extension> extensions = new ArrayList<Extension>();
+            for (Extension extension : flexmarkOptions.get(Parser.EXTENSIONS)) {
+                extensions.add(extension);
+            }
+            extensions.add(PageGeneratorExtension.create());
+            flexmarkOptions.set(Parser.EXTENSIONS, extensions);
+        }
+
+        Parser parser = Parser.builder(flexmarkOptions).build();
+        HtmlRenderer renderer = HtmlRenderer.builder(flexmarkOptions).build();
 
         for (MarkdownDTO dto : markdownDTOs) {
             getLog().debug("dto: " + dto);
@@ -326,19 +372,13 @@ public class MdPageGeneratorMojo extends AbstractMojo {
                 markdown = replaceVariables(markdown, dto.substitutes);
                 // getLog().debug(markdown);
 
-                PegDownProcessor pegDownProcessor = new PegDownProcessor(options, getParsingTimeoutInMillis());
                 String markdownAsHtml;
-                if (transformRelativeMarkdownLinks) {
-                    markdownAsHtml = pegDownProcessor.markdownToHtml(markdown, new MDToHTMLExpLinkRender(inputFileExtension));
-                } else {
-                    markdownAsHtml = pegDownProcessor.markdownToHtml(markdown);
-                }
-                StringBuilder data = new StringBuilder();
-                data.append(headerHtml);
-                data.append(markdownAsHtml);
-                data.append(footerHtml);
 
-                FileUtils.writeStringToFile(dto.htmlFile, data.toString(), getOutputEncoding());
+                Node document = parser.parse(markdown);
+                markdownAsHtml = renderer.render(document);
+
+                String data = headerHtml + markdownAsHtml + footerHtml;
+                FileUtils.writeStringToFile(dto.htmlFile, data, getOutputEncoding());
             } catch (MojoExecutionException e) {
                 throw e;
             } catch (IOException e) {
@@ -368,13 +408,13 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         return inputFileExtension;
     }
 
-    private long getParsingTimeoutInMillis() {
-        if (parsingTimeoutInMillis != null) {
-            return parsingTimeoutInMillis;
-        }
-
-        return PegDownProcessor.DEFAULT_MAX_PARSING_TIME;
-    }
+    //private long getParsingTimeoutInMillis() {
+    //    if (parsingTimeoutInMillis != null) {
+    //        return parsingTimeoutInMillis;
+    //    }
+    //
+    //    return PegDownProcessor.DEFAULT_MAX_PARSING_TIME;
+    //}
 
     /**
      * Get the first h1 for the title.
@@ -429,10 +469,10 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     }
 
     /**
-     * Replace variables to the html file.
+     * Replace variables in the html file.
      *
-     * @param initialContent
-     * @param variables
+     * @param initialContent html
+     * @param variables      variable map
      * @return the updated html
      */
     private String replaceVariables(String initialContent, Map<String, String> variables) {
@@ -452,7 +492,6 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     private static boolean isVariableLine(String line) {
         return line.matches("^\\{.*=.*\\}$");
     }
-
 
     /**
      * Update relative include paths corresponding to the markdown file's location in the folder structure.
@@ -521,13 +560,12 @@ public class MdPageGeneratorMojo extends AbstractMojo {
      * Store information about markdown file.
      */
     private class MarkdownDTO {
-        public String title;
-        public Map<String, String> substitutes = new HashMap<String, String>();
-        public File htmlFile;
-        public File markdownFile;
-        public int folderDepth = 0;
+        String title;
+        Map<String, String> substitutes = new HashMap<String, String>();
+        File htmlFile;
+        File markdownFile;
+        int folderDepth = 0;
     }
-
 
     /**
      * MAVEN RESOURCE FILTERING: Heavily borrowed from Apache Maven ResourcesMojo (https://maven.apache.org/plugins/maven-resources-plugin)
@@ -577,7 +615,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         plexusContainer = (PlexusContainer) context.get(PlexusConstants.PLEXUS_KEY);
     }
 
-    private void peformMavenPropertyFiltering(final File inputDirectory, final File outputDirectory, final String inputEncoding) throws MojoExecutionException {
+    private void performMavenPropertyFiltering(final File inputDirectory, final File outputDirectory, final String inputEncoding) throws MojoExecutionException {
         try {
             List<String> combinedFilters = getCombinedFiltersList();
 
@@ -619,7 +657,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
             mavenResourcesExecution.getOutputDirectory();
         } catch (MavenFilteringException e) {
-            throw new MojoExecutionException("Failure while processing/fitering markdown sources: " + e.getMessage(), e);
+            throw new MojoExecutionException("Failure while processing/filtering markdown sources: " + e.getMessage(), e);
         }
     }
 
@@ -706,5 +744,4 @@ public class MdPageGeneratorMojo extends AbstractMojo {
             return result;
         }
     }
-
 }
