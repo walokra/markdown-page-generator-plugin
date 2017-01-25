@@ -7,7 +7,7 @@ This plugin is a fork of [walokra/markdown-page-generator-plugin] and replaces [
 markdown processor with [flexmark-java] processor.
 
 [![Build status](https://travis-ci.org/vsch/markdown-page-generator-plugin.svg?branch=master)](https://travis-ci.org/vsch/markdown-page-generator-plugin)
-[![Maven Central status](https://img.shields.io/maven-central/v/com.vladsch.flexmark/markdown-page-generator-plugin.svg)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.vladsch.flexmark%3Amarkdown-page-generator-plugin%22)
+[![Maven Central status](https://img.shields.io/maven-central/v/com.vladsch.flexmark/markdown-page-generator-plugin.svg)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.vladsch.flexmark%22%20AND%20a%3A%22markdown-page-generator-plugin%22)
 
 Dependency Information:
 
