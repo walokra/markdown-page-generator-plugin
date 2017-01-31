@@ -102,6 +102,20 @@ Configuration options:
 * `transformRelativeMarkdownLinks`: Transform relative url suffix from `.md` to `.html` if
   option `true`. Default `false`.
 
+* `attributes`: defines a list of attributes by `Node` class to apply to HTML results. Each
+  `attribute` has the syntax:
+  `NodeClass|attributeName1=attributeValue1|attributeName2=attributeValue2`
+
+  for table, block quote and ordered list item class customization:
+
+  ```xml
+  <attributes>
+      <attribute>TableBlock|class=table table-striped table-bordered</attribute>
+      <attribute>BlockQuote|class=red</attribute>
+      <attribute>OrderedListItem|style="color:red;"</attribute>
+  </attributes>
+  ```
+
 * `pegdownExtensions`: Comma separated list of constants as specified in
   `com.vladsch.flexmark.profiles.pegdown.Extensions`. The default is `TABLES`.
 

@@ -103,6 +103,49 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         assertTrue(markDown.contains("README.html"));
     }
 
+    public void testCustomAttributes()
+            throws Exception {
+        final String expectedGeneratedHTMLFile = "/target/test-harness/custom-attributes/target/html/README.html";
+
+        File pom = getTestFile("src/test/resources/custom-attributes/pom.xml");
+        assertTrue(pom.exists());
+
+        MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
+        assertNotNull(mdPageGeneratorMojo);
+        assertEquals("md", mdPageGeneratorMojo.getInputFileExtension());
+
+        mdPageGeneratorMojo.execute();
+
+        File generatedMarkdown = new File(getBasedir(), expectedGeneratedHTMLFile);
+        assertTrue("Expected HTML file does not exist: " + generatedMarkdown, generatedMarkdown.exists());
+
+        String markDown = FileUtils.readFileToString(generatedMarkdown, "ISO-8859-15");
+        assertNotNull(markDown);
+        assertEquals("<h1>Lorem ipsum</h1>\n" +
+"<table class=\"table table-striped\">\n" +
+"<thead>\n" +
+"<tr><th> header 1 </th><th> header 2 </th></tr>\n" +
+"</thead>\n" +
+"<tbody>\n" +
+"<tr><td> data 1   </td><td> data 2   </td></tr>\n" +
+"<tr><td> data 3   </td><td> data 3   </td></tr>\n" +
+"</tbody>\n" +
+"</table>\n" +
+"<ul>\n" +
+"<li>bullet item 1</li>\n" +
+"<li>bullet item 2</li>\n" +
+"</ul>\n" +
+"<p>Paragraph</p>\n" +
+"<ol>\n" +
+"<li style=\"color:red\">numbered item 1</li>\n" +
+"<li style=\"color:red\">numbered item 2</li>\n" +
+"</ol>\n" +
+"<blockquote class=\"red\">\n" +
+"<p>block quote paragraph text</p>\n" +
+"</blockquote>\n", markDown);
+        //assertTrue(markDown.contains("README.html"));
+    }
+
     public void testRecursiveProject()
             throws Exception {
         final String expectedGeneratedHTMLFileBaseDir = "/target/test-harness/recursive-project/target/html/";
