@@ -119,35 +119,32 @@ Configuration options:
 
   Core Nodes:
 
-  * OrderedList
-  * OrderedListItem
   * AutoLink
-  * OrderedList
-  * Heading
   * BlockQuote
-  * IndentedCodeBlock
   * BulletList
   * BulletListItem
+  * Code
+  * Emphasis
+  * FencedCodeBlock
+  * Heading
   * Image
   * ImageRef
+  * IndentedCodeBlock
   * Link
   * LinkRef
   * MailLink
-  * Emphasis
-  * FencedCodeBlock
-  * Code
-  * StrongEmphasis
-  * ThematicBreak
-
-  extension nodes:
-
-  * TableBlock
-  * TableCaption
-  * TableRow
-  * TableHead
-  * TableCell
-  * TableBody
+  * OrderedList
+  * OrderedList
+  * OrderedListItem
   * Strikethrough
+  * StrongEmphasis
+  * TableBlock
+  * TableBody
+  * TableCaption
+  * TableCell
+  * TableHead
+  * TableRow
+  * ThematicBreak
 
 * `pegdownExtensions`: Comma separated list of constants as specified in
   `com.vladsch.flexmark.profiles.pegdown.Extensions`. The default is `TABLES`.
