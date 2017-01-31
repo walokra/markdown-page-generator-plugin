@@ -104,7 +104,8 @@ Configuration options:
 
 * `attributes`: defines a list of attributes by `Node` class to apply to HTML results. Each
   `attribute` has the syntax:
-  `NodeClass|attributeName1=attributeValue1|attributeName2=attributeValue2`
+  `NodeClass|attributeName1=attributeValue1|attributeName2=attributeValue2` will add
+  `attributeName1` and `attributeName2` to element node `NodeClass`
 
   for table, block quote and ordered list item class customization:
 
