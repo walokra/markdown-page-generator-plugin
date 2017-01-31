@@ -129,7 +129,10 @@ Configuration options:
   * BulletList
   * BulletListItem
   * Image
+  * ImageRef
   * Link
+  * LinkRef
+  * MailLink
   * Emphasis
   * FencedCodeBlock
   * Code
