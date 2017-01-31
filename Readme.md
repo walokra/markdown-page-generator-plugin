@@ -119,6 +119,7 @@ Configuration options:
 
   Core Nodes:
 
+  * OrderedList
   * OrderedListItem
   * AutoLink
   * OrderedList
