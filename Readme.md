@@ -120,30 +120,55 @@ Configuration options:
   Core Nodes:
 
   * AutoLink
+
   * BlockQuote
+
   * BulletList
+
   * BulletListItem
+
   * Code
+
   * Emphasis
+
   * FencedCodeBlock
+
   * Heading
+
   * Image
+
   * ImageRef
+
   * IndentedCodeBlock
+
   * Link
+
   * LinkRef
+
   * MailLink
+
   * OrderedList
+
   * OrderedList
+
   * OrderedListItem
+
   * Strikethrough
+
   * StrongEmphasis
+
   * TableBlock
+
   * TableBody
+
   * TableCaption
+
   * TableCell
+
   * TableHead
+
   * TableRow
+
   * ThematicBreak
 
 * `pegdownExtensions`: Comma separated list of constants as specified in
@@ -153,11 +178,10 @@ Configuration options:
   [pegdown] in addition to extensions available in pegdown 1.6.0, the following extensions are
   available:
 
-  * `SMARTS`: :warning: Not Implemented. Beautifies `...` `. . .`, `--` and `---` to `…`, `…`, `–`
-    and `—` respectively.
+  * `SMARTS`: Beautifies `...` `. . .`, `--` and `---` to `…`, `…`, `–` and `—` respectively.
 
-  * `QUOTES`: :warning: Not Implemented. Beautifies single quotes `'`, `"`, `<<` and `>>` to `‘`
-  `’` `‛`, `“` `”` `‟`, `«` and `»`
+  * `QUOTES`: Beautifies single quotes `'`, `"`, `<<` and `>>` to `‘` `’` `‛`, `“` `”` `‟`, `«`
+    and `»`
 
   * `SMARTYPANTS`: Convenience extension enabling both, `SMARTS` and `QUOTES`, at once.
 
@@ -209,21 +233,21 @@ Configuration options:
 
   * `TOC`: used to enable table of contents extension `[TOC]` The TOC tag has the following
     format: `[TOC style]`. `style` consists of space separated list of options:
-    - `levels=levelList` where level list is a comma separated list of levels or ranges. Default
+    * `levels=levelList` where level list is a comma separated list of levels or ranges. Default
       is to include heading levels 2 and 3. Examples:
-      - `levels=4` include levels 2, 3 and 4
-      - `levels=2-4` include levels 2, 3 and 4. same as `levels=4`
-      - `levels=2-4,5` include levels 2, 3, 4 and 5
-      - `levels=1,3` include levels 1 and 3
-    - `text` to only include the text of the heading
-    - `formatted` to include text and inline formatting
-    - `bullet` to use a bullet list for the TOC items
-    - `numbered` to use a numbered list for TOC items
-    - `hierarchy`: hierarchical list of headings
-    - `flat`: flat list of headings
-    - `reversed`: flat reversed list of headings
-    - `increasing`: flat, alphabetically increasing by heading text
-    - `decreasing`: flat, alphabetically decreasing by heading text
+      * `levels=4` include levels 2, 3 and 4
+      * `levels=2-4` include levels 2, 3 and 4. same as `levels=4`
+      * `levels=2-4,5` include levels 2, 3, 4 and 5
+      * `levels=1,3` include levels 1 and 3
+    * `text` to only include the text of the heading
+    * `formatted` to include text and inline formatting
+    * `bullet` to use a bullet list for the TOC items
+    * `numbered` to use a numbered list for TOC items
+    * `hierarchy`: hierarchical list of headings
+    * `flat`: flat list of headings
+    * `reversed`: flat reversed list of headings
+    * `increasing`: flat, alphabetically increasing by heading text
+    * `decreasing`: flat, alphabetically decreasing by heading text
 
   * `MULTI_LINE_IMAGE_URLS`: enables parsing of image urls spanning more than one line the
     format is strict `![alt text](urladdress?` must be the last non-blank segment on a line. The
@@ -400,14 +424,14 @@ Input- and Output-Encoding can be specified by:
 </plugin>
 ```
 
+[flexmark-java]: https://github.com/vsch/flexmark-java
 [Github-flavoured-Markdown]: http://github.github.com/github-flavored-markdown/
 [MultiMarkdown]: http://fletcherpenney.net/multimarkdown/
+[Pandoc]: http://pandoc.org/MANUAL.html#pandocs-markdown
+[pegdown]: http://pegdown.org
 [PHP Markdown Extra]: http://michelf.com/projects/php-markdown/extra/#abbr
 [PHP Markdown Extra: definition list]: http://michelf.com/projects/php-markdown/extra/#def-list
 [PHP Markdown Extra: fenced code]: http://michelf.com/projects/php-markdown/extra/#fenced-code-blocks
 [PHP Markdown Extra: tables]: http://michelf.com/projects/php-markdown/extra/#table
-[Pandoc]: http://pandoc.org/MANUAL.html#pandocs-markdown
-[flexmark-java]: https://github.com/vsch/flexmark-java
-[pegdown]: http://pegdown.org
 [walokra/markdown-page-generator-plugin]: https://github.com/walokra/markdown-page-generator-plugin
 
