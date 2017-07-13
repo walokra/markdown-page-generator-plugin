@@ -190,7 +190,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         if (StringUtils.isNotEmpty(copyDirectories)) {
             getLog().info("Copy files from directories");
             for (String dir : copyDirectories.split(",")) {
-                copyFiles(inputDirectory + File.separator + dir, outputDirectory + File.separator + dir);
+               new FileCopyTask(getLog()).copyFiles(inputDirectory, outputDirectory, dir);
             }
         }
     }
