@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -190,10 +191,22 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         if (StringUtils.isNotEmpty(copyDirectories)) {
             getLog().info("Copy files from directories");
             for (String dir : copyDirectories.split(",")) {
-                copyFiles(inputDirectory + File.separator + dir, outputDirectory + File.separator + dir);
+                for ( Entry<String, String> copyAction : getFoldersToCopy(inputDirectory, outputDirectory, dir).entrySet()){
+                    copyFiles(copyAction.getKey(), copyAction.getValue());
+                }
             }
         }
     }
+    
+    private Map<String, String> getFoldersToCopy(String inputDirectory, String outputDirectory, String dir) {
+       Map<String, String> retValue = new HashMap<>();
+       
+       retValue.put(inputDirectory + File.separator + dir, outputDirectory + File.separator + dir);
+       
+       return retValue;
+    
+    }
+
 
     /**
      * Parse attributes of the form NodeName:attributeName=attribute value:attributeName=attribute value...
