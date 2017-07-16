@@ -162,6 +162,32 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     @Parameter(property = "generate.filteredOutputDirectory", defaultValue = "${project.build.directory}/filtered-md/")
     private File filteredOutputDirectory;
 
+    public String getInputDirectory() {
+        return inputDirectory;
+    }
+
+    public void setInputDirectory(String inputDirectory) {
+        this.inputDirectory = inputDirectory;
+    }
+
+    public String getOutputDirectory() {
+        return outputDirectory;
+    }
+
+    public void setOutputDirectory(String outputDirectory) {
+        this.outputDirectory = outputDirectory;
+    }
+
+    public String getCopyDirectories() {
+        return copyDirectories;
+    }
+
+    public void setCopyDirectories(String copyDirectories) {
+        this.copyDirectories = copyDirectories;
+    }
+
+    
+    
     /**
      * Execute the maven plugin.
      *
