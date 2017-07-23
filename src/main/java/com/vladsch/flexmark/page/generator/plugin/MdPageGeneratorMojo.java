@@ -33,6 +33,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -223,15 +225,53 @@ public class MdPageGeneratorMojo extends AbstractMojo {
             }
         }
     }
-    
-    private Map<String, String> getFoldersToCopy(String inputDirectory, String outputDirectory, String dir) {
-       Map<String, String> retValue = new HashMap<>();
-       
-       retValue.put(inputDirectory + File.separator + dir, outputDirectory + File.separator + dir);
-       
-       return retValue;
-    
+ 
+    private Map<String, String> getFoldersToCopy(String inputDirectory, String outputDirectory, String dir) throws MojoExecutionException {
+        try {
+            Map<String, String> retValue = new HashMap<>();
+
+            Collection<Path> stream = getPathMatchingGlob(inputDirectory, dir);
+            for (Path path : stream) {
+                final Path inFolderPath = new File(inputDirectory).toPath();
+                Path relativePath = inFolderPath.relativize(path);
+
+                Path resolvedOutPath = new File(outputDirectory).toPath().resolve(relativePath);
+                Path resolvedInPath = new File(inputDirectory).toPath().resolve(relativePath);
+
+                retValue.put(resolvedInPath.toFile().getAbsolutePath(), resolvedOutPath.toFile().getAbsolutePath());
+            }
+
+            return retValue;
+        } catch (IOException ex) {
+            throw new MojoExecutionException("failed to determine the folders to copy", ex);
+        }
+
     }
+
+    private Collection<Path> getPathMatchingGlob(String inputDirectory1, String dir) throws IOException {
+        List<Path> retValue = new LinkedList<>();
+
+        Iterator<File> files = FileUtils.iterateFiles(new File(inputDirectory1), null, true);
+        while (files.hasNext()) {
+            File file = files.next();
+            file = file.getParentFile();
+
+            if (file.isDirectory()) {
+
+                String expandedGlob = new File(inputDirectory1).getAbsolutePath() + File.separator + dir;
+                PathMatcher pathMatcher = file.toPath().getFileSystem().getPathMatcher("glob:" + expandedGlob);
+
+                if (pathMatcher.matches(file.toPath())) {
+                    if (!retValue.contains(file.toPath())) {
+                        retValue.add(file.toPath());
+                    }
+                }
+            }
+        }
+
+        return retValue;
+    }
+
 
 
     /**
