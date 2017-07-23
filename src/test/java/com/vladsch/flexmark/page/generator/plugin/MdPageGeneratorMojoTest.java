@@ -344,13 +344,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
                     final File subFolder = getSubFolder(destinationFolder, folderName);
                     Assert.assertTrue(subFolder.exists());
 
-                    final File imageFolder = getSubFolder(subFolder, folderName);
-                    Assert.assertTrue(imageFolder.exists());
-
-                    for (String fileName : new String[]{"file1", "file2", "file3"}) {
-
-                        Assert.assertTrue(getSubFolder(imageFolder, fileName).exists());
-                    }
+                    verifyImageFolder(subFolder, "images");
                 }
 
             } finally {
@@ -374,7 +368,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
 
                     createImageFolderWithFiles(subFolder);
 
-                    for (String subFolderName : new String[]{"folder1", "folder1", "folder1"}) {
+                    for (String subFolderName : new String[]{"folder1", "folder2", "folder3"}) {
                         final File subSubFolder = getSubFolder(subFolder, subFolderName);
 
                         subSubFolder.mkdir();
@@ -399,12 +393,13 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
                     final File subFolder = getSubFolder(destinationFolder, folderName);
                     Assert.assertTrue(subFolder.exists());
 
-                    final File imageFolder = getSubFolder(subFolder, folderName);
-                    Assert.assertTrue(imageFolder.exists());
+                    verifyImageFolder(subFolder, "images");
 
-                    for (String fileName : new String[]{"file1", "file2", "file3"}) {
+                    for (String subFolderName : new String[]{"folder1", "folder2", "folder3"}) {
+                        final File subSubFolder = getSubFolder(subFolder, subFolderName);
+                        Assert.assertTrue(subSubFolder.exists());
 
-                        Assert.assertTrue(getSubFolder(imageFolder, fileName).exists());
+                        verifyImageFolder(subSubFolder, "images");
                     }
                 }
 
@@ -415,6 +410,16 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
             deleteRecursively(sourceFolder);
         }
 
+    }
+
+    private void verifyImageFolder(final File subFolder, String folderName) {
+        final File imageFolder = getSubFolder(subFolder, folderName);
+        Assert.assertTrue(imageFolder.exists());
+
+        for (String fileName : new String[]{"file1", "file2", "file3"}) {
+
+            Assert.assertTrue(getSubFolder(imageFolder, fileName).exists());
+        }
     }
 
     private File createImageFolderWithFiles(final File subFolder) throws IOException {
