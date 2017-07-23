@@ -261,6 +261,106 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
 
     }
 
+    @Test
+    public void testCopiedFilesWithWildcard() throws MojoExecutionException, IOException {
+        File sourceFolder = Files.createTempDir();
+        try {
+            File destinationFolder = Files.createTempDir();
+            try {
+                for (String folderName : new String[]{"folder1", "folder2", "folder3"}) {
+                    final File subFolder = getSubFolder(sourceFolder, folderName);
+                    subFolder.mkdir();
+                    for (String fileName : new String[]{"file1", "file2", "file3"}) {
+
+                        getSubFolder(subFolder, fileName).createNewFile();
+                    }
+                }
+
+                MdPageGeneratorMojo mdPageGeneratorMojo = new MdPageGeneratorMojo();
+                mdPageGeneratorMojo.setInputDirectory(sourceFolder.getAbsolutePath());
+                mdPageGeneratorMojo.setOutputDirectory(destinationFolder.getAbsolutePath());
+                mdPageGeneratorMojo.setCopyDirectories("folder*");
+
+                mdPageGeneratorMojo.execute();
+
+                Assert.assertTrue(getSubFolder(destinationFolder, "folder1").exists());
+                Assert.assertTrue(getSubFolder(destinationFolder, "folder2").exists());
+                Assert.assertTrue(getSubFolder(destinationFolder, "folder3").exists());
+                Assert.assertFalse(getSubFolder(destinationFolder, "folder4").exists());
+
+            } finally {
+                deleteRecursively(destinationFolder);
+            }
+        } finally {
+            deleteRecursively(sourceFolder);
+        }
+
+    }
+
+    @Test
+    public void testCopiedFilesWithSubFoldersAndWildcard() throws MojoExecutionException, IOException {
+        File sourceFolder = Files.createTempDir();
+        try {
+            File destinationFolder = Files.createTempDir();
+            try {
+                for (String folderName : new String[]{"folder1", "folder2", "folder3"}) {
+                    final File subFolder = getSubFolder(sourceFolder, folderName);
+                    subFolder.mkdir();
+
+                    createImageFolderWithFiles(subFolder);
+
+                    for (String subFolderName : new String[]{"folder1", "folder1", "folder1"}) {
+                        final File subSubFolder = getSubFolder(subFolder, subFolderName);
+
+                        subSubFolder.createNewFile();
+                        createImageFolderWithFiles(subSubFolder);
+                    }
+                }
+
+                MdPageGeneratorMojo mdPageGeneratorMojo = new MdPageGeneratorMojo();
+                mdPageGeneratorMojo.setInputDirectory(sourceFolder.getAbsolutePath());
+                mdPageGeneratorMojo.setOutputDirectory(destinationFolder.getAbsolutePath());
+                mdPageGeneratorMojo.setCopyDirectories("folder*/images");
+
+                mdPageGeneratorMojo.execute();
+
+                Assert.assertTrue(getSubFolder(destinationFolder, "folder1").exists());
+                Assert.assertTrue(getSubFolder(destinationFolder, "folder2").exists());
+                Assert.assertTrue(getSubFolder(destinationFolder, "folder3").exists());
+                Assert.assertFalse(getSubFolder(destinationFolder, "folder4").exists());
+
+                for (String folderName : new String[]{"folder1", "folder2", "folder3"}) {
+                    final File subFolder = getSubFolder(destinationFolder, folderName);
+                    Assert.assertTrue(subFolder.exists());
+
+                    final File imageFolder = getSubFolder(subFolder, folderName);
+                    Assert.assertTrue(imageFolder.exists());
+
+                    for (String fileName : new String[]{"file1", "file2", "file3"}) {
+
+                        Assert.assertTrue(getSubFolder(imageFolder, fileName).exists());
+                    }
+                }
+
+            } finally {
+                deleteRecursively(destinationFolder);
+            }
+        } finally {
+            deleteRecursively(sourceFolder);
+        }
+
+    }
+
+    private File createImageFolderWithFiles(final File subFolder) throws IOException {
+        final File subSubFolder = getSubFolder(subFolder, "images");
+        subSubFolder.mkdir();
+        for (String fileName : new String[]{"file1", "file2", "file3"}) {
+
+            getSubFolder(subSubFolder, fileName).createNewFile();
+        }
+        return subSubFolder;
+    }
+
     private static File getSubFolder(File sourceFolder, final String folderName) {
         return sourceFolder.toPath().resolve(folderName).toFile();
     }
