@@ -1,32 +1,40 @@
 package com.vladsch.flexmark.page.generator.plugin;
 
+import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Iterator;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Unit test for {@link MdPageGeneratorMojo}
  */
 public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
+
     public void testEncoding() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/encoding-project/target/html/README.html";
 
         // ensure this java-File will not be affected by
         // encoding issues therefore escape umlaut-characters
-        final String UMLAUTS =
-                "Some Umlauts: " +
-                        "\u00f6" + // &ouml;
-                        "\u00e4" + // &auml;
-                        "\u00fc" + // &uuml;
-                        " " +
-                        "\u00d6" + // &Ouml;
-                        "\u00c4" + // &Auml;
-                        "\u00dc" + // &Uuml;
-                        " " + //
-                        "\u00df"; // &szlig;
-        final String EURO =
-                "Euro: " +
-                        "\u20ac"; // &euro;
+        final String UMLAUTS
+                = "Some Umlauts: "
+                + "\u00f6" + // &ouml;
+                "\u00e4" + // &auml;
+                "\u00fc" + // &uuml;
+                " "
+                + "\u00d6" + // &Ouml;
+                "\u00c4" + // &Auml;
+                "\u00dc" + // &Uuml;
+                " " + //
+                "\u00df"; // &szlig;
+        final String EURO
+                = "Euro: "
+                + "\u20ac"; // &euro;
 
         File pom = getTestFile("src/test/resources/encoding-project/pom.xml");
         assertTrue(pom.exists());
@@ -121,28 +129,28 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
 
         String markDown = FileUtils.readFileToString(generatedMarkdown, "ISO-8859-15");
         assertNotNull(markDown);
-        assertEquals("<h1>Lorem ipsum</h1>\n" +
-"<table class=\"table table-striped\">\n" +
-"<thead>\n" +
-"<tr><th> header 1 </th><th> header 2 </th></tr>\n" +
-"</thead>\n" +
-"<tbody>\n" +
-"<tr><td> data 1   </td><td> data 2   </td></tr>\n" +
-"<tr><td> data 3   </td><td> data 3   </td></tr>\n" +
-"</tbody>\n" +
-"</table>\n" +
-"<ul>\n" +
-"<li>bullet item 1</li>\n" +
-"<li>bullet item 2</li>\n" +
-"</ul>\n" +
-"<p>Paragraph</p>\n" +
-"<ol>\n" +
-"<li style=\"color:red\">numbered item 1</li>\n" +
-"<li style=\"color:red\">numbered item 2</li>\n" +
-"</ol>\n" +
-"<blockquote class=\"red\">\n" +
-"<p>block quote paragraph text</p>\n" +
-"</blockquote>\n", markDown);
+        assertEquals("<h1>Lorem ipsum</h1>\n"
+                + "<table class=\"table table-striped\">\n"
+                + "<thead>\n"
+                + "<tr><th> header 1 </th><th> header 2 </th></tr>\n"
+                + "</thead>\n"
+                + "<tbody>\n"
+                + "<tr><td> data 1   </td><td> data 2   </td></tr>\n"
+                + "<tr><td> data 3   </td><td> data 3   </td></tr>\n"
+                + "</tbody>\n"
+                + "</table>\n"
+                + "<ul>\n"
+                + "<li>bullet item 1</li>\n"
+                + "<li>bullet item 2</li>\n"
+                + "</ul>\n"
+                + "<p>Paragraph</p>\n"
+                + "<ol>\n"
+                + "<li style=\"color:red\">numbered item 1</li>\n"
+                + "<li style=\"color:red\">numbered item 2</li>\n"
+                + "</ol>\n"
+                + "<blockquote class=\"red\">\n"
+                + "<p>block quote paragraph text</p>\n"
+                + "</blockquote>\n", markDown);
         //assertTrue(markDown.contains("README.html"));
     }
 
@@ -187,7 +195,6 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
     //        assertEquals(ParsingTimeoutException.class, ex.getCause().getClass());
     //    }
     //}
-
     public void testSubstituteProject() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/substitute-project/target/html/README.html";
 
@@ -219,4 +226,229 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         assertTrue("Should contain the original var 'cacheManager'", html.contains("${cacheManager}"));
     }
 
+    @Test
+    public void testCopiedFiles() throws MojoExecutionException, IOException {
+        File sourceFolder = Files.createTempDir();
+        try {
+            File destinationFolder = Files.createTempDir();
+            try {
+                for (String folderName : new String[]{"folder1", "folder2", "folder3"}) {
+                    final File subFolder = getSubFolder(sourceFolder, folderName);
+                    subFolder.mkdir();
+                    for (String fileName : new String[]{"file1", "file2", "file3"}) {
+
+                        getSubFolder(subFolder, fileName).createNewFile();
+                    }
+                }
+
+                printStructure("input", sourceFolder);
+
+                MdPageGeneratorMojo mdPageGeneratorMojo = new MdPageGeneratorMojo();
+                mdPageGeneratorMojo.setInputDirectory(sourceFolder.getAbsolutePath());
+                mdPageGeneratorMojo.setOutputDirectory(destinationFolder.getAbsolutePath());
+                mdPageGeneratorMojo.setCopyDirectories("folder1,folder3,folder4");
+
+                mdPageGeneratorMojo.execute();
+
+                printStructure("output", sourceFolder);
+
+                Assert.assertTrue(getSubFolder(destinationFolder, "folder1").exists());
+                Assert.assertFalse(getSubFolder(destinationFolder, "folder2").exists());
+                Assert.assertTrue(getSubFolder(destinationFolder, "folder3").exists());
+                Assert.assertFalse(getSubFolder(destinationFolder, "folder4").exists());
+
+            } finally {
+                deleteRecursively(destinationFolder);
+            }
+        } finally {
+            deleteRecursively(sourceFolder);
+        }
+
+    }
+
+    @Test
+    public void testCopiedFilesWithWildcard() throws MojoExecutionException, IOException {
+        File sourceFolder = Files.createTempDir();
+        try {
+            File destinationFolder = Files.createTempDir();
+            try {
+                for (String folderName : new String[]{"folder1", "folder2", "folder3"}) {
+                    final File subFolder = getSubFolder(sourceFolder, folderName);
+                    subFolder.mkdir();
+                    for (String fileName : new String[]{"file1", "file2", "file3"}) {
+
+                        getSubFolder(subFolder, fileName).createNewFile();
+                    }
+                }
+                printStructure("input", sourceFolder);
+
+                MdPageGeneratorMojo mdPageGeneratorMojo = new MdPageGeneratorMojo();
+                mdPageGeneratorMojo.setInputDirectory(sourceFolder.getAbsolutePath());
+                mdPageGeneratorMojo.setOutputDirectory(destinationFolder.getAbsolutePath());
+                mdPageGeneratorMojo.setCopyDirectories("folder*");
+
+                mdPageGeneratorMojo.execute();
+
+                printStructure("output", destinationFolder);
+
+                Assert.assertTrue(getSubFolder(destinationFolder, "folder1").exists());
+                Assert.assertTrue(getSubFolder(destinationFolder, "folder2").exists());
+                Assert.assertTrue(getSubFolder(destinationFolder, "folder3").exists());
+                Assert.assertFalse(getSubFolder(destinationFolder, "folder4").exists());
+
+            } finally {
+                deleteRecursively(destinationFolder);
+            }
+        } finally {
+            deleteRecursively(sourceFolder);
+        }
+
+    }
+
+    @Test
+    public void testCopiedFilesWithSubFoldersAndWildcard() throws MojoExecutionException, IOException {
+        File sourceFolder = Files.createTempDir();
+        try {
+            File destinationFolder = Files.createTempDir();
+            try {
+                for (String folderName : new String[]{"folder1", "folder2", "folder3"}) {
+                    final File subFolder = getSubFolder(sourceFolder, folderName);
+                    subFolder.mkdir();
+
+                    createImageFolderWithFiles(subFolder);
+
+                    for (String subFolderName : new String[]{"folder1", "folder1", "folder1"}) {
+                        final File subSubFolder = getSubFolder(subFolder, subFolderName);
+
+                        subSubFolder.mkdir();
+                        createImageFolderWithFiles(subSubFolder);
+                    }
+                }
+                printStructure("input", sourceFolder);
+
+                MdPageGeneratorMojo mdPageGeneratorMojo = new MdPageGeneratorMojo();
+                mdPageGeneratorMojo.setInputDirectory(sourceFolder.getAbsolutePath());
+                mdPageGeneratorMojo.setOutputDirectory(destinationFolder.getAbsolutePath());
+                mdPageGeneratorMojo.setCopyDirectories("folder*/images");
+
+                mdPageGeneratorMojo.execute();
+
+                printStructure("output", destinationFolder);
+
+                Assert.assertTrue(getSubFolder(destinationFolder, "folder1").exists());
+                Assert.assertTrue(getSubFolder(destinationFolder, "folder2").exists());
+                Assert.assertTrue(getSubFolder(destinationFolder, "folder3").exists());
+                Assert.assertFalse(getSubFolder(destinationFolder, "folder4").exists());
+
+                for (String folderName : new String[]{"folder1", "folder2", "folder3"}) {
+                    final File subFolder = getSubFolder(destinationFolder, folderName);
+                    Assert.assertTrue(subFolder.exists());
+
+                    verifyImageFolder(subFolder, "images");
+                }
+
+            } finally {
+                deleteRecursively(destinationFolder);
+            }
+        } finally {
+            deleteRecursively(sourceFolder);
+        }
+
+    }
+
+    @Test
+    public void testCopiedFilesWithSubFoldersAndDoubleStarWildcard() throws MojoExecutionException, IOException {
+        File sourceFolder = Files.createTempDir();
+        try {
+            File destinationFolder = Files.createTempDir();
+            try {
+                for (String folderName : new String[]{"folder1", "folder2", "folder3"}) {
+                    final File subFolder = getSubFolder(sourceFolder, folderName);
+                    subFolder.mkdir();
+
+                    createImageFolderWithFiles(subFolder);
+
+                    for (String subFolderName : new String[]{"folder1", "folder2", "folder3"}) {
+                        final File subSubFolder = getSubFolder(subFolder, subFolderName);
+
+                        subSubFolder.mkdir();
+                        createImageFolderWithFiles(subSubFolder);
+                    }
+                }
+
+                printStructure("input", sourceFolder);
+
+                MdPageGeneratorMojo mdPageGeneratorMojo = new MdPageGeneratorMojo();
+                mdPageGeneratorMojo.setInputDirectory(sourceFolder.getAbsolutePath());
+                mdPageGeneratorMojo.setOutputDirectory(destinationFolder.getAbsolutePath());
+                mdPageGeneratorMojo.setCopyDirectories("**/images");
+
+                mdPageGeneratorMojo.execute();
+
+                printStructure("output", destinationFolder);
+
+                Assert.assertFalse(getSubFolder(destinationFolder, "folder4").exists());
+
+                for (String folderName : new String[]{"folder1", "folder2", "folder3"}) {
+                    final File subFolder = getSubFolder(destinationFolder, folderName);
+                    Assert.assertTrue(subFolder.exists());
+
+                    verifyImageFolder(subFolder, "images");
+
+                    for (String subFolderName : new String[]{"folder1", "folder2", "folder3"}) {
+                        final File subSubFolder = getSubFolder(subFolder, subFolderName);
+                        Assert.assertTrue(subSubFolder.exists());
+
+                        verifyImageFolder(subSubFolder, "images");
+                    }
+                }
+
+            } finally {
+                deleteRecursively(destinationFolder);
+            }
+        } finally {
+            deleteRecursively(sourceFolder);
+        }
+
+    }
+
+    private void verifyImageFolder(final File subFolder, String folderName) {
+        final File imageFolder = getSubFolder(subFolder, folderName);
+        Assert.assertTrue(imageFolder.exists());
+
+        for (String fileName : new String[]{"file1", "file2", "file3"}) {
+
+            Assert.assertTrue(getSubFolder(imageFolder, fileName).exists());
+        }
+    }
+
+    private File createImageFolderWithFiles(final File subFolder) throws IOException {
+        final File subSubFolder = getSubFolder(subFolder, "images");
+        subSubFolder.mkdir();
+        for (String fileName : new String[]{"file1", "file2", "file3"}) {
+
+            getSubFolder(subSubFolder, fileName).createNewFile();
+        }
+        return subSubFolder;
+    }
+
+    private static File getSubFolder(File sourceFolder, final String folderName) {
+        return sourceFolder.toPath().resolve(folderName).toFile();
+    }
+
+    private void deleteRecursively(File folder) {
+        for (File toDelete : folder.listFiles()) {
+            toDelete.delete();
+        }
+        folder.delete();
+    }
+
+    private void printStructure(String type, File folderToPrint) {
+        System.out.println("file structure of '" + type + "'");
+        Iterator<File> files = FileUtils.iterateFiles(folderToPrint, null, true);
+        while (files.hasNext()) {
+            File file = files.next();
+            System.out.println(folderToPrint.toPath().relativize(file.toPath()));
+        }
+    }
 }

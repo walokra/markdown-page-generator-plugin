@@ -91,7 +91,7 @@ Configuration options:
   ```
 
 * `copyDirectories`: Comma separated list of directories to copy to output directory, like:
-  `css,js,images`
+  `css,js,images,folder*/images,**images'
 
 * `defaultTitle`: If set the titleToken is replaced in every page. Otherwise the first h1 is
   used.
