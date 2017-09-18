@@ -9,14 +9,14 @@ markdown processor with [flexmark-java] processor.
 [![Build status](https://travis-ci.org/vsch/markdown-page-generator-plugin.svg?branch=master)](https://travis-ci.org/vsch/markdown-page-generator-plugin)
 [![Maven Central status](https://img.shields.io/maven-central/v/com.vladsch.flexmark/markdown-page-generator-plugin.svg)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.vladsch.flexmark%22%20AND%20a%3A%22markdown-page-generator-plugin%22)
 
-Dependency Information:
+Plugin Information:
 
 ```xml
-<dependency>
+<plugin>
     <groupId>com.vladsch.flexmark</groupId>
     <artifactId>markdown-page-generator-plugin</artifactId>
-    <version>RELEASE</version>
-</dependency>
+    <version>0.22.14</version>
+</plugin>
 ```
 
 You can configure the input and output directories, which files to copy and which pegdown
@@ -342,10 +342,10 @@ Add the plugin to the pom file in your project:
         <plugin>
             <groupId>com.vladsch.flexmark</groupId>
             <artifactId>markdown-page-generator-plugin</artifactId>
-            <version>RELEASE</version>
+            <version>0.22.14</version>
             <executions>
                 <execution>
-                    <phase>process-sources</phase>
+                    <phase>process-resources</phase>
                     <goals>
                         <goal>generate</goal>
                     </goals>
@@ -362,10 +362,10 @@ Or with custom header and footer:
 <plugin>
     <groupId>com.vladsch.flexmark</groupId>
     <artifactId>markdown-page-generator-plugin</artifactId>
-    <version>RELEASE</version>
+    <version>0.22.14</version>
     <executions>
         <execution>
-            <phase>process-sources</phase>
+            <phase>process-resources</phase>
             <goals>
                 <goal>generate</goal>
             </goals>
@@ -385,10 +385,10 @@ You can also specify the Pegdown extensions:
 <plugin>
     <groupId>com.vladsch.flexmark</groupId>
     <artifactId>markdown-page-generator-plugin</artifactId>
-    <version>RELEASE</version>
+    <version>0.22.14</version>
     <executions>
         <execution>
-            <phase>process-sources</phase>
+            <phase>process-resources</phase>
             <goals>
                 <goal>generate</goal>
             </goals>
@@ -406,10 +406,10 @@ Input- and Output-Encoding can be specified by:
 <plugin>
     <groupId>com.vladsch.flexmark</groupId>
     <artifactId>markdown-page-generator-plugin</artifactId>
-    <version>RELEASE</version>
+    <version>0.22.14</version>
     <executions>
         <execution>
-            <phase>process-sources</phase>
+            <phase>process-test-resources</phase>
             <goals>
                 <goal>generate</goal>
             </goals>
