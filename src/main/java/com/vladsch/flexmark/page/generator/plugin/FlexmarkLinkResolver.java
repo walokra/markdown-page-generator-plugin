@@ -20,10 +20,7 @@ import com.vladsch.flexmark.ext.wikilink.internal.WikiLinkLinkResolver;
 import com.vladsch.flexmark.html.IndependentLinkResolverFactory;
 import com.vladsch.flexmark.html.LinkResolver;
 import com.vladsch.flexmark.html.LinkResolverFactory;
-import com.vladsch.flexmark.html.renderer.LinkStatus;
-import com.vladsch.flexmark.html.renderer.LinkType;
-import com.vladsch.flexmark.html.renderer.NodeRendererContext;
-import com.vladsch.flexmark.html.renderer.ResolvedLink;
+import com.vladsch.flexmark.html.renderer.*;
 import com.vladsch.flexmark.util.options.DataHolder;
 
 import java.util.HashSet;
@@ -32,13 +29,13 @@ import java.util.Set;
 public class FlexmarkLinkResolver implements LinkResolver {
     final String inputFileExtension;
 
-    public FlexmarkLinkResolver(NodeRendererContext context) {
+    public FlexmarkLinkResolver(LinkResolverContext context) {
         DataHolder options = context.getOptions();
         this.inputFileExtension = options.get(PageGeneratorExtension.INPUT_FILE_EXTENSION);
     }
 
     @Override
-    public ResolvedLink resolveLink(Node node, NodeRendererContext context, ResolvedLink link) {
+    public ResolvedLink resolveLink(Node node, LinkResolverContext context, ResolvedLink link) {
         ResolvedLink result = link;
 
         if (link.getLinkType() == LinkType.LINK) {
@@ -66,7 +63,7 @@ public class FlexmarkLinkResolver implements LinkResolver {
         }
 
         @Override
-        public LinkResolver create(NodeRendererContext context) {
+        public LinkResolver create(LinkResolverContext context) {
             return new FlexmarkLinkResolver(context);
         }
     }
