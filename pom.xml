@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.vladsch.flexmark</groupId>
     <artifactId>markdown-page-generator-plugin</artifactId>
-    <version>0.27.1</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
     <name>Markdown Page Generator Maven Plugin</name>
     <description>Markdown to HTML Page Generator Maven Plugin</description>
@@ -20,21 +19,15 @@
 
     <developers>
         <developer>
-            <name>Vladimir Schneider</name>
-            <email>vladimir@vladsch.com</email>
-            <organization>vladsch.com</organization>
-            <organizationUrl>https://vladsch.com/</organizationUrl>
-        </developer>
-        <developer>
             <name>Marko Wallin</name>
             <email>marko.wallink@iki.fi</email>
         </developer>
     </developers>
 
     <scm>
-        <url>git@github.com:vsch/markdown-page-generator-plugin.git</url>
-        <connection>scm:git:git@github.com:vsch/markdown-page-generator-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:vsch/markdown-page-generator-plugin.git</developerConnection>
+        <url>git@github.com:walokra/markdown-page-generator-plugin.git</url>
+        <connection>scm:git:git@github.com:walokra/markdown-page-generator-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:walokra/markdown-page-generator-plugin.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
@@ -183,50 +176,27 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>deploy-to-sonatype</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>deploy</goal>
-                            <!--
-                                                            <goal>release</goal>
-                            -->
-                        </goals>
-                    </execution>
-                </executions>
+              <groupId>org.jacoco</groupId>
+              <artifactId>jacoco-maven-plugin</artifactId>
+              <version>0.7.9</version>
+              <executions>
+                <execution>
+                  <goals>
+                    <goal>prepare-agent</goal>
+                  </goals>
+                </execution>
+                <execution>
+                  <id>report</id>
+                  <phase>prepare-package</phase>
+                  <goals>
+                    <goal>report</goal>
+                  </goals>
+                </execution>
+              </executions>
             </plugin>
-                    <plugin>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <version>${jacoco.version}</version>
-            <executions>
-                <execution>
-                    <goals>
-                        <goal>prepare-agent</goal>
-                    </goals>
-                </execution>
-                <execution>
-                    <id>report</id>
-                    <phase>prepare-package</phase>
-                    <goals>
-                        <goal>report</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
         </plugins>
     </build>
 
-<!--
     <profiles>
         <profile>
             <id>release</id>
@@ -276,6 +246,5 @@
             </build>
         </profile>
     </profiles>
--->
 
 </project>
