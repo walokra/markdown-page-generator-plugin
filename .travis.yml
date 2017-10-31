@@ -1,1 +1,10 @@
-language: java
+dist: precise
+
+jdk:
+  - oraclejdk7
+
+env:
+  - TEST=java
+
+script:
+  - 'if [[ $TEST = java ]]; then mvn test -Dsurefire.useFile=false; fi'
