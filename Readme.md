@@ -7,13 +7,13 @@ The plugin can be found in [Sonatype's OSS repository](https://oss.sonatype.org/
 Continuous integration:
 [![Build Status](https://travis-ci.org/walokra/markdown-page-generator-plugin.svg?branch=master)](https://travis-ci.org/walokra/markdown-page-generator-plugin)
 
-Dependency Information:
+Plugin Information:
 
-        <dependency>
+        <plugin>
             <groupId>com.ruleoftech</groupId>
             <artifactId>markdown-page-generator-plugin</artifactId>
             <version>1.0.0</version>
-        </dependency>
+        </plugin>
 
 You can configure the input and output directories, which files to copy and which pegdown options are used. You can also include custom header and footer and general title. 
 
@@ -95,7 +95,7 @@ Add the plugin to the pom file in your project:
 					<version>1.0.0</version>
 					<executions>
 						<execution>
-							<phase>process-sources</phase>
+							<phase>process-resources</phase>
 							<goals>
 								<goal>generate</goal>
 							</goals>
@@ -113,7 +113,7 @@ Or with custom header and footer:
 			<version>1.0.0</version>
 			<executions>
 				<execution>
-					<phase>process-sources</phase>
+					<phase>process-resources</phase>
 					<goals>
 						<goal>generate</goal>
 					</goals>
@@ -134,7 +134,7 @@ You can also specify the Pegdown extensions:
 			<version>1.0.0</version>
 			<executions>
 				<execution>
-					<phase>process-sources</phase>
+					<phase>process-resources</phase>
 					<goals>
 						<goal>generate</goal>
 					</goals>
@@ -153,7 +153,7 @@ Input- and Output-Encoding can be specified by:
 			<version>1.0.0</version>
 			<executions>
 				<execution>
-					<phase>process-sources</phase>
+					<phase>process-resources</phase>
 					<goals>
 						<goal>generate</goal>
 					</goals>
