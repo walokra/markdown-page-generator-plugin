@@ -10,3 +10,5 @@ release.properties
 .idea
 *.iml
 
+/pom.xml.versionsBackup
+/markdown-page-generator-plugin.wiki/

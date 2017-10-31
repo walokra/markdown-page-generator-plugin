@@ -1,4 +1,4 @@
-package com.ruleoftech.markdown.page.generator.plugin;
+package com.vladsch.flexmark.page.generator.plugin;
 
 import java.io.File;
 import java.util.Arrays;
