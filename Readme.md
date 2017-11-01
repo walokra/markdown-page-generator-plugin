@@ -16,7 +16,7 @@ Plugin Information:
 <plugin>
     <groupId>com.ruleoftech</groupId>
     <artifactId>markdown-page-generator-plugin</artifactId>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
 </plugin>
 ```
 
@@ -341,7 +341,7 @@ Add the plugin to the pom file in your project:
         <plugin>
             <groupId>com.ruleoftech</groupId>
             <artifactId>markdown-page-generator-plugin</artifactId>
-            <version>1.0.0</version>
+            <version>2.0.0</version>
             <executions>
                 <execution>
                     <phase>process-resources</phase>
@@ -361,7 +361,7 @@ Or with custom header and footer:
 <plugin>
     <groupId>com.ruleoftech</groupId>
     <artifactId>markdown-page-generator-plugin</artifactId>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
     <executions>
         <execution>
             <phase>process-resources</phase>
@@ -384,7 +384,7 @@ You can also specify the Pegdown extensions:
 <plugin>
     <groupId>com.ruleoftech</groupId>
     <artifactId>markdown-page-generator-plugin</artifactId>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
     <executions>
         <execution>
             <phase>process-resources</phase>
@@ -405,7 +405,7 @@ Input- and Output-Encoding can be specified by:
 <plugin>
     <groupId>com.ruleoftech</groupId>
     <artifactId>markdown-page-generator-plugin</artifactId>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
     <executions>
         <execution>
             <phase>process-resources</phase>

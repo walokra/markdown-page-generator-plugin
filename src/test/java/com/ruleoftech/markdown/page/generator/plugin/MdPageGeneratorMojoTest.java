@@ -1,14 +1,14 @@
-package com.vladsch.flexmark.page.generator.plugin;
+package com.ruleoftech.markdown.page.generator.plugin;
 
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
-import org.junit.Assert;
-import org.junit.Test;
 
 /**
  * Unit test for {@link MdPageGeneratorMojo}

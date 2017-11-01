@@ -1,4 +1,4 @@
-package com.vladsch.flexmark.page.generator.plugin;
+package com.ruleoftech.markdown.page.generator.plugin;
 
 import com.vladsch.flexmark.Extension;
 import com.vladsch.flexmark.html.HtmlRenderer;

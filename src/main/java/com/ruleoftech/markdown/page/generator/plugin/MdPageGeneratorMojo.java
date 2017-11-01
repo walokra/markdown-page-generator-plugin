@@ -1,4 +1,4 @@
-package com.vladsch.flexmark.page.generator.plugin;
+package com.ruleoftech.markdown.page.generator.plugin;
 
 import com.vladsch.flexmark.Extension;
 import com.vladsch.flexmark.ast.Node;
@@ -188,8 +188,8 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         this.copyDirectories = copyDirectories;
     }
 
-    
-    
+
+
     /**
      * Execute the maven plugin.
      *
@@ -225,7 +225,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
             }
         }
     }
- 
+
     private Map<String, String> getFoldersToCopy(String inputDirectory, String outputDirectory, String dir) throws MojoExecutionException {
         try {
             Map<String, String> retValue = new HashMap<>();

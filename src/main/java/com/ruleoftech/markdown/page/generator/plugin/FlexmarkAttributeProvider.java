@@ -1,4 +1,4 @@
-package com.vladsch.flexmark.page.generator.plugin;
+package com.ruleoftech.markdown.page.generator.plugin;
 
 import com.vladsch.flexmark.ast.Node;
 import com.vladsch.flexmark.html.AttributeProvider;

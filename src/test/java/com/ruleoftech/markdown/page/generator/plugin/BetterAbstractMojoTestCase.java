@@ -1,16 +1,19 @@
-package com.vladsch.flexmark.page.generator.plugin;
+package com.ruleoftech.markdown.page.generator.plugin;
 
-import java.io.File;
-import java.util.Arrays;
-
-import org.apache.maven.*;
+import org.apache.maven.DefaultMaven;
+import org.apache.maven.Maven;
 import org.apache.maven.execution.*;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
-import org.apache.maven.project.*;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+
+import java.io.File;
+import java.util.Arrays;
 
 /**
  * Borrowed from <strong>ahgittin</strong> to provide a working Maven project as part of unit testing.

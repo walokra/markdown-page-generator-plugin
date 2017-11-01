@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.vladsch.flexmark.test</groupId>
+    <groupId>com.ruleoftech.test</groupId>
     <artifactId>basic</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -25,7 +25,7 @@
 
         <plugins>
             <plugin>
-                <groupId>com.vladsch.flexmark</groupId>
+                <groupId>com.ruleoftech</groupId>
                 <artifactId>markdown-page-generator-plugin</artifactId>
                 <executions>
                     <execution>
