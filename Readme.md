@@ -20,6 +20,10 @@ Plugin Information:
 </plugin>
 ```
 
+Artifacts:
+* [Snapshots](https://oss.sonatype.org/content/repositories/snapshots/com/ruleoftech/markdown-page-generator-plugin/)
+* [Releases](https://oss.sonatype.org/content/repositories/releases/com/ruleoftech/markdown-page-generator-plugin/)
+
 You can configure the input and output directories, which files to copy and which pegdown
 options are used. You can also include custom header and footer and general title.
 
