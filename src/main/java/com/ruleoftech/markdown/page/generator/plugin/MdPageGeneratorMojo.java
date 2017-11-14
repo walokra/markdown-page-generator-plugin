@@ -259,6 +259,10 @@ public class MdPageGeneratorMojo extends AbstractMojo {
             if (file.isDirectory()) {
 
                 String expandedGlob = new File(inputDirectory1).getAbsolutePath() + File.separator + dir;
+                // we need other sysntax on windows systems
+                if(File.separator.equals("\\")){
+					expandedGlob = expandedGlob.replaceAll("\\\\", "\\\\\\\\");
+				}
                 PathMatcher pathMatcher = file.toPath().getFileSystem().getPathMatcher("glob:" + expandedGlob);
 
                 if (pathMatcher.matches(file.toPath())) {
