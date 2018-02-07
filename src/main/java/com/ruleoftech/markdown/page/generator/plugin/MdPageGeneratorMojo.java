@@ -9,6 +9,7 @@ import com.vladsch.flexmark.profiles.pegdown.PegdownOptionsAdapter;
 import com.vladsch.flexmark.util.html.Attributes;
 import com.vladsch.flexmark.util.options.MutableDataHolder;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.interpolation.MavenBuildTimestamp;
@@ -82,8 +83,8 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     @Parameter(property = "generate.parsingTimeoutInMillis")
     private Long parsingTimeoutInMillis;
 
-    @Parameter(property = "generate.inputFileExtension", defaultValue = "md")
-    private String inputFileExtension = "md";
+    @Parameter(property = "generate.inputFileExtensions", defaultValue = "md")
+    private String inputFileExtensions = "md";
 
     @Parameter(property = "generate.applyFiltering", defaultValue = "false")
     private boolean applyFiltering;
@@ -351,7 +352,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
             int baseDepth = StringUtils.countMatches(inputDirectory.getAbsolutePath(), File.separator);
 
             // Reading just the markdown dir and sub dirs if recursive option set
-            List<File> markdownFiles = getFilesAsArray(FileUtils.iterateFiles(inputDirectory, new String[] { inputFileExtension }, recursiveInput));
+            List<File> markdownFiles = getFilesAsArray(FileUtils.iterateFiles(inputDirectory, getInputFileExtensions(), recursiveInput));
 
             for (File file : markdownFiles) {
                 getLog().debug("File getName() " + file.getName());
@@ -381,6 +382,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
                     }
                 }
 
+                String inputFileExtension = FilenameUtils.getExtension(file.getName());
                 dto.htmlFile = new File(
                         recursiveInput
                                 ? outputDirectory + File.separator + file.getParentFile().getPath().substring(inputDirectory.getPath().length()) + File.separator + file.getName().replaceAll(
@@ -443,7 +445,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         }
 
         if (transformRelativeMarkdownLinks) {
-            flexmarkOptions.set(PageGeneratorExtension.INPUT_FILE_EXTENSION, inputFileExtension);
+            flexmarkOptions.set(PageGeneratorExtension.INPUT_FILE_EXTENSIONS, inputFileExtensions);
             extensions.add(PageGeneratorExtension.create());
         }
 
@@ -524,8 +526,8 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         }
     }
 
-    public String getInputFileExtension() {
-        return inputFileExtension;
+    public String[] getInputFileExtensions() {
+        return inputFileExtensions.trim().split("\\s*,\\s*");
     }
 
     //private long getParsingTimeoutInMillis() {

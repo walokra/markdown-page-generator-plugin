@@ -325,6 +325,17 @@ Configuration options:
 
   * `INSERTED`: inserted or underlined extension `++inserted++`
 
+* `inputFileExtensions`: Comma-separated input file extensions (auto trim included), default:
+  `md`
+
+Example
+
+```xml
+  <configuration>
+    <inputFileExtensions> md, markdown </headerHtmlFile>
+  </configuration>
+```
+
 * `inputEncoding`: Charset-Name used for reading the md-input, default:
   `${project.build.sourceEncoding}` or `Default-Charset`
 
