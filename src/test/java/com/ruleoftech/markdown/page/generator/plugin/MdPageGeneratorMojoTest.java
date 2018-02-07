@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -98,7 +99,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
 
         MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
         assertNotNull(mdPageGeneratorMojo);
-        assertEquals("markdown", mdPageGeneratorMojo.getInputFileExtension());
+        assertTrue(Arrays.equals(new String[]{"md", "markdown"}, mdPageGeneratorMojo.getInputFileExtensions()));
 
         mdPageGeneratorMojo.execute();
 
@@ -119,7 +120,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
 
         MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
         assertNotNull(mdPageGeneratorMojo);
-        assertEquals("md", mdPageGeneratorMojo.getInputFileExtension());
+        assertTrue(Arrays.equals(new String[]{"md"}, mdPageGeneratorMojo.getInputFileExtensions()));
 
         mdPageGeneratorMojo.execute();
 

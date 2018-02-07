@@ -6,7 +6,7 @@ import com.vladsch.flexmark.util.options.DataKey;
 import com.vladsch.flexmark.util.options.MutableDataHolder;
 
 public class PageGeneratorExtension implements HtmlRenderer.HtmlRendererExtension {
-    final static public DataKey<String> INPUT_FILE_EXTENSION = new DataKey<String>("INPUT_FILE_EXTENSION", "md");
+    final static public DataKey<String> INPUT_FILE_EXTENSIONS = new DataKey<String>("INPUT_FILE_EXTENSIONS", "md");
 
     @Override
     public void rendererOptions(final MutableDataHolder options) {

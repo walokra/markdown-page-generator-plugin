@@ -12,28 +12,32 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class FlexmarkLinkResolver implements LinkResolver {
-    final String inputFileExtension;
+    final String[] inputFileExtensions;
 
     public FlexmarkLinkResolver(LinkResolverContext context) {
         DataHolder options = context.getOptions();
-        this.inputFileExtension = options.get(PageGeneratorExtension.INPUT_FILE_EXTENSION);
+        this.inputFileExtensions = options.get(PageGeneratorExtension.INPUT_FILE_EXTENSIONS).trim().split("\\s*,\\s*");
     }
 
     @Override
     public ResolvedLink resolveLink(Node node, LinkResolverContext context, ResolvedLink link) {
         ResolvedLink result = link;
 
-        if (link.getLinkType() == LinkType.LINK) {
-            String url = link.getUrl();
-            if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                if (url.endsWith("." + inputFileExtension)) {
-                    url = url.substring(0, url.length() - inputFileExtension.length()) + "html";
-                } else if (url.contains("." + inputFileExtension + "#")) {
-                    url = url.replace("." + inputFileExtension + "#", ".html#");
+        for (String inputFileExtension : inputFileExtensions) {
+            if (link.getLinkType() == LinkType.LINK) {
+                String url = link.getUrl();
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                    if (url.endsWith("." + inputFileExtension)) {
+                        url = url.substring(0, url.length() - inputFileExtension.length()) + "html";
+                        result = result.withStatus(LinkStatus.VALID).withUrl(url);
+                        return result;
+                    } else if (url.contains("." + inputFileExtension + "#")) {
+                        url = url.replace("." + inputFileExtension + "#", ".html#");
+                        result = result.withStatus(LinkStatus.VALID).withUrl(url);
+                        return result;
+                    }
                 }
-                result = result.withStatus(LinkStatus.VALID).withUrl(url);
             }
-            return result;
         }
 
         return result;

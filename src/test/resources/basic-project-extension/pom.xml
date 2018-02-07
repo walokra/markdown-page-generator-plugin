@@ -38,7 +38,7 @@
                 <configuration>
                     <pegdownExtensions>TABLES</pegdownExtensions>
                     <transformRelativeMarkdownLinks>true</transformRelativeMarkdownLinks>
-                    <inputFileExtension>markdown</inputFileExtension>
+                    <inputFileExtensions> md , markdown </inputFileExtensions>
                 </configuration>
             </plugin>
         </plugins>
