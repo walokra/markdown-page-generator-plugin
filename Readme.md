@@ -1,10 +1,6 @@
 # Markdown to HTML Page Generator Maven Plugin
 
-Plugin creates static HTML pages with Maven and Markdown. Uses [flexmark-java] Markdown
-processor. The code is Open Source and under MIT license.
-
-This plugin is a fork of [walokra/markdown-page-generator-plugin] and replaces [pegdown]
-markdown processor with [flexmark-java] processor.
+Plugin creates static HTML pages with Maven and Markdown. Uses [flexmark-java] Markdown processor. The code is Open Source and under MIT license.
 
 [![Build Status](https://travis-ci.org/walokra/markdown-page-generator-plugin.svg?branch=master)](https://travis-ci.org/walokra/markdown-page-generator-plugin)
 
