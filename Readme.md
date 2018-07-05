@@ -328,7 +328,7 @@ Example
 
 ```xml
   <configuration>
-    <inputFileExtensions> md, markdown </headerHtmlFile>
+    <inputFileExtensions> md, markdown </inputFileExtensions>
   </configuration>
 ```
 
