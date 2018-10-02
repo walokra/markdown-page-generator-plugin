@@ -107,53 +107,6 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     @Parameter(property = "generate.pegdownExtensions", defaultValue = "TABLES")
     private String pegdownExtensions;
 
-    private enum EPegdownExtensions {
-        NONE(Extensions.NONE),
-        SMARTS(Extensions.SMARTS),
-        QUOTES(Extensions.QUOTES),
-        SMARTYPANTS(Extensions.SMARTYPANTS),
-        ABBREVIATIONS(Extensions.ABBREVIATIONS),
-        HARDWRAPS(Extensions.HARDWRAPS),
-        AUTOLINKS(Extensions.AUTOLINKS),
-        TABLES(Extensions.TABLES),
-        DEFINITIONS(Extensions.DEFINITIONS),
-        FENCED_CODE_BLOCKS(Extensions.FENCED_CODE_BLOCKS),
-        WIKILINKS(Extensions.WIKILINKS),
-        STRIKETHROUGH(Extensions.STRIKETHROUGH),
-        ANCHORLINKS(Extensions.ANCHORLINKS),
-        ALL(Extensions.ALL),
-        SUPPRESS_HTML_BLOCKS(Extensions.SUPPRESS_HTML_BLOCKS),
-        SUPPRESS_INLINE_HTML(Extensions.SUPPRESS_INLINE_HTML),
-        SUPPRESS_ALL_HTML(Extensions.SUPPRESS_ALL_HTML),
-        ATXHEADERSPACE(Extensions.ATXHEADERSPACE),
-        SUBSCRIPT(Extensions.SUBSCRIPT),
-        RELAXEDHRULES(Extensions.RELAXEDHRULES),
-        TASKLISTITEMS(Extensions.TASKLISTITEMS),
-        EXTANCHORLINKS(Extensions.EXTANCHORLINKS),
-        EXTANCHORLINKS_WRAP(Extensions.EXTANCHORLINKS_WRAP),
-        FOOTNOTES(Extensions.FOOTNOTES),
-        TOC(Extensions.TOC),
-        MULTI_LINE_IMAGE_URLS(Extensions.MULTI_LINE_IMAGE_URLS),
-        SUPERSCRIPT(Extensions.SUPERSCRIPT),
-        FORCELISTITEMPARA(Extensions.FORCELISTITEMPARA),
-        INSERTED(Extensions.INSERTED),
-        ALL_OPTIONALS(Extensions.ALL_OPTIONALS),
-        ALL_WITH_OPTIONALS(Extensions.ALL_WITH_OPTIONALS),
-        GITHUB_DOCUMENT_COMPATIBLE(Extensions.GITHUB_DOCUMENT_COMPATIBLE),
-        GITHUB_WIKI_COMPATIBLE(Extensions.GITHUB_WIKI_COMPATIBLE),
-        GITHUB_COMMENT_COMPATIBLE(Extensions.GITHUB_COMMENT_COMPATIBLE);
-
-        private final int value;
-
-        EPegdownExtensions(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
-    }
-
     /**
      * Comma separated string of directories to be copied.
      */
@@ -189,8 +142,6 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         this.copyDirectories = copyDirectories;
     }
 
-
-
     /**
      * Execute the maven plugin.
      *
@@ -220,36 +171,31 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         if (StringUtils.isNotEmpty(copyDirectories)) {
             getLog().info("Copy files from directories");
             for (String dir : copyDirectories.split(",")) {
-                for ( Entry<String, String> copyAction : getFoldersToCopy(inputDirectory, outputDirectory, dir).entrySet()){
+                for (Entry<String, String> copyAction : getFoldersToCopy(inputDirectory, outputDirectory, dir).entrySet()) {
                     copyFiles(copyAction.getKey(), copyAction.getValue());
                 }
             }
         }
     }
 
-    private Map<String, String> getFoldersToCopy(String inputDirectory, String outputDirectory, String dir) throws MojoExecutionException {
-        try {
-            Map<String, String> retValue = new HashMap<>();
+    private Map<String, String> getFoldersToCopy(String inputDirectory, String outputDirectory, String dir) {
+        Map<String, String> retValue = new HashMap<>();
 
-            Collection<Path> stream = getPathMatchingGlob(inputDirectory, dir);
-            for (Path path : stream) {
-                final Path inFolderPath = new File(inputDirectory).toPath();
-                Path relativePath = inFolderPath.relativize(path);
+        Collection<Path> stream = getPathMatchingGlob(inputDirectory, dir);
+        for (Path path : stream) {
+            final Path inFolderPath = new File(inputDirectory).toPath();
+            Path relativePath = inFolderPath.relativize(path);
 
-                Path resolvedOutPath = new File(outputDirectory).toPath().resolve(relativePath);
-                Path resolvedInPath = new File(inputDirectory).toPath().resolve(relativePath);
+            Path resolvedOutPath = new File(outputDirectory).toPath().resolve(relativePath);
+            Path resolvedInPath = new File(inputDirectory).toPath().resolve(relativePath);
 
-                retValue.put(resolvedInPath.toFile().getAbsolutePath(), resolvedOutPath.toFile().getAbsolutePath());
-            }
-
-            return retValue;
-        } catch (IOException ex) {
-            throw new MojoExecutionException("failed to determine the folders to copy", ex);
+            retValue.put(resolvedInPath.toFile().getAbsolutePath(), resolvedOutPath.toFile().getAbsolutePath());
         }
 
+        return retValue;
     }
 
-    private Collection<Path> getPathMatchingGlob(String inputDirectory1, String dir) throws IOException {
+    private Collection<Path> getPathMatchingGlob(String inputDirectory1, String dir) {
         List<Path> retValue = new LinkedList<>();
 
         Iterator<File> files = FileUtils.iterateFiles(new File(inputDirectory1), null, true);
@@ -260,10 +206,10 @@ public class MdPageGeneratorMojo extends AbstractMojo {
             if (file.isDirectory()) {
 
                 String expandedGlob = new File(inputDirectory1).getAbsolutePath() + File.separator + dir;
-                // we need other sysntax on windows systems
-                if(File.separator.equals("\\")){
-					expandedGlob = expandedGlob.replaceAll("\\\\", "\\\\\\\\");
-				}
+                // we need other syntax on windows systems
+                if (File.separator.equals("\\")) {
+                    expandedGlob = expandedGlob.replaceAll("\\\\", "\\\\\\\\");
+                }
                 PathMatcher pathMatcher = file.toPath().getFileSystem().getPathMatcher("glob:" + expandedGlob);
 
                 if (pathMatcher.matches(file.toPath())) {
@@ -276,7 +222,6 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
         return retValue;
     }
-
 
 
     /**
@@ -435,11 +380,10 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     private void processMarkdown(List<MarkdownDTO> markdownDTOs, int options, final Map<String, Attributes> attributesMap) throws MojoExecutionException {
         getLog().debug("Process Markdown");
         getLog().debug("inputEncoding: '" + getInputEncoding() + "', outputEncoding: '" + getOutputEncoding() + "'");
-        //getLog().debug("parsingTimeout: " + getParsingTimeoutInMillis() + " ms");
         getLog().debug("applyFiltering: " + applyFiltering);
 
         MutableDataHolder flexmarkOptions = PegdownOptionsAdapter.flexmarkOptions(options).toMutable();
-        ArrayList<Extension> extensions = new ArrayList<Extension>();
+        ArrayList<Extension> extensions = new ArrayList<>();
         for (Extension extension : flexmarkOptions.get(Parser.EXTENSIONS)) {
             extensions.add(extension);
         }
@@ -492,7 +436,6 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
                 String markdown = FileUtils.readFileToString(dto.markdownFile, getInputEncoding());
                 markdown = replaceVariables(markdown, dto.substitutes);
-                // getLog().debug(markdown);
 
                 String markdownAsHtml;
 
@@ -529,14 +472,6 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     public String[] getInputFileExtensions() {
         return inputFileExtensions.trim().split("\\s*,\\s*");
     }
-
-    //private long getParsingTimeoutInMillis() {
-    //    if (parsingTimeoutInMillis != null) {
-    //        return parsingTimeoutInMillis;
-    //    }
-    //
-    //    return PegDownProcessor.DEFAULT_MAX_PARSING_TIME;
-    //}
 
     /**
      * Get the first h1 for the title.
