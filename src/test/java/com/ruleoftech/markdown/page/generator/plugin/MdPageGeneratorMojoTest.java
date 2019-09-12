@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -54,8 +55,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
 
     }
 
-    public void testBasicProject()
-            throws Exception {
+    public void testBasicProject() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/basic-project/target/html/README.html";
 
         File pom = getTestFile("src/test/resources/basic-project/pom.xml");
@@ -90,8 +90,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
 
     }
 
-    public void testBasicProjectExtension()
-            throws Exception {
+    public void testBasicProjectExtension() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/basic-project-extension/target/html/README.html";
 
         File pom = getTestFile("src/test/resources/basic-project-extension/pom.xml");
@@ -111,8 +110,20 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         assertTrue(markDown.contains("README.html"));
     }
 
-    public void testCustomAttributes()
-            throws Exception {
+    public void testEmptyBasicProject() {
+        File pom = getTestFile("src/test/resources/empty-basic-project/pom.xml");
+        assertTrue(pom.exists());
+
+        try {
+            MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
+            assertNotNull(mdPageGeneratorMojo);
+            mdPageGeneratorMojo.execute();
+        } catch (final Exception e) {
+            assertTrue(e.toString(), false);
+        }
+    }
+
+    public void testCustomAttributes() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/custom-attributes/target/html/README.html";
 
         File pom = getTestFile("src/test/resources/custom-attributes/pom.xml");
@@ -151,11 +162,9 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
                 + "<blockquote class=\"red\">\n"
                 + "<p>block quote paragraph text</p>\n"
                 + "</blockquote>\n", markDown);
-        //assertTrue(markDown.contains("README.html"));
     }
 
-    public void testRecursiveProject()
-            throws Exception {
+    public void testRecursiveProject() throws Exception {
         final String expectedGeneratedHTMLFileBaseDir = "/target/test-harness/recursive-project/target/html/";
 
         File pom = getTestFile("src/test/resources/recursive-project/pom.xml");
@@ -195,6 +204,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
     //        assertEquals(ParsingTimeoutException.class, ex.getCause().getClass());
     //    }
     //}
+
     public void testSubstituteProject() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/substitute-project/target/html/README.html";
 
@@ -209,7 +219,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         File generatedMarkdown = new File(getBasedir(), expectedGeneratedHTMLFile);
         assertTrue("Expected HTML file does not exist: " + generatedMarkdown, generatedMarkdown.exists());
 
-        String html = FileUtils.readFileToString(generatedMarkdown);
+        String html = FileUtils.readFileToString(generatedMarkdown, Charset.defaultCharset());
 
         assertFalse("Shouldn't contain the var declaration", html.contains("headerSubstitution"));
         assertFalse("Shouldn't contain the var declaration", html.contains("footerSubstitution"));
@@ -232,14 +242,9 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         try {
             File destinationFolder = Files.createTempDir();
             try {
-                for (String folderName : new String[]{"folder1", "folder2", "folder3"}) {
-                    final File subFolder = getSubFolder(sourceFolder, folderName);
-                    subFolder.mkdir();
-                    for (String fileName : new String[]{"file1", "file2", "file3"}) {
-
-                        getSubFolder(subFolder, fileName).createNewFile();
-                    }
-                }
+                String[] folderNames = new String[]{"folder1", "folder2", "folder3"};
+                String[] fileNames = new String[]{"file1", "file2", "file3"};
+                createSubFoldersAndFiles(folderNames, fileNames, sourceFolder);
 
                 printStructure("input", sourceFolder);
 
@@ -263,7 +268,6 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         } finally {
             deleteRecursively(sourceFolder);
         }
-
     }
 
     @Test
@@ -272,14 +276,10 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         try {
             File destinationFolder = Files.createTempDir();
             try {
-                for (String folderName : new String[]{"folder1", "folder2", "folder3"}) {
-                    final File subFolder = getSubFolder(sourceFolder, folderName);
-                    subFolder.mkdir();
-                    for (String fileName : new String[]{"file1", "file2", "file3"}) {
+                String[] folderNames = new String[]{"folder1", "folder2", "folder3"};
+                String[] fileNames = new String[]{"file1", "file2", "file3"};
+                createSubFoldersAndFiles(folderNames, fileNames, sourceFolder);
 
-                        getSubFolder(subFolder, fileName).createNewFile();
-                    }
-                }
                 printStructure("input", sourceFolder);
 
                 MdPageGeneratorMojo mdPageGeneratorMojo = new MdPageGeneratorMojo();
@@ -302,7 +302,6 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         } finally {
             deleteRecursively(sourceFolder);
         }
-
     }
 
     @Test
@@ -311,19 +310,10 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         try {
             File destinationFolder = Files.createTempDir();
             try {
-                for (String folderName : new String[]{"folder1", "folder2", "folder3"}) {
-                    final File subFolder = getSubFolder(sourceFolder, folderName);
-                    subFolder.mkdir();
+                String[] folderNames = new String[]{"folder1", "folder2", "folder3"};
+                String[] subFolderNames = new String[]{"folder1", "folder1", "folder1"};
+                createImageSubFoldersAndFiles(folderNames, subFolderNames, sourceFolder);
 
-                    createImageFolderWithFiles(subFolder);
-
-                    for (String subFolderName : new String[]{"folder1", "folder1", "folder1"}) {
-                        final File subSubFolder = getSubFolder(subFolder, subFolderName);
-
-                        subSubFolder.mkdir();
-                        createImageFolderWithFiles(subSubFolder);
-                    }
-                }
                 printStructure("input", sourceFolder);
 
                 MdPageGeneratorMojo mdPageGeneratorMojo = new MdPageGeneratorMojo();
@@ -353,7 +343,6 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         } finally {
             deleteRecursively(sourceFolder);
         }
-
     }
 
     @Test
@@ -362,19 +351,9 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         try {
             File destinationFolder = Files.createTempDir();
             try {
-                for (String folderName : new String[]{"folder1", "folder2", "folder3"}) {
-                    final File subFolder = getSubFolder(sourceFolder, folderName);
-                    subFolder.mkdir();
-
-                    createImageFolderWithFiles(subFolder);
-
-                    for (String subFolderName : new String[]{"folder1", "folder2", "folder3"}) {
-                        final File subSubFolder = getSubFolder(subFolder, subFolderName);
-
-                        subSubFolder.mkdir();
-                        createImageFolderWithFiles(subSubFolder);
-                    }
-                }
+                String[] folderNames = new String[]{"folder1", "folder2", "folder3"};
+                String[] subFolderNames = new String[]{"folder1", "folder2", "folder3"};
+                createImageSubFoldersAndFiles(folderNames, subFolderNames, sourceFolder);
 
                 printStructure("input", sourceFolder);
 
@@ -412,12 +391,37 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
 
     }
 
+    private void createSubFoldersAndFiles(String[] folderNames, String[] fileNames, File sourceFolder) throws IOException {
+        for (String folderName : folderNames) {
+            final File subFolder = getSubFolder(sourceFolder, folderName);
+            subFolder.mkdir();
+            for (String fileName : fileNames) {
+                getSubFolder(subFolder, fileName).createNewFile();
+            }
+        }
+    }
+
+    private void createImageSubFoldersAndFiles(String[] folderNames, String[] subFolderNames, File sourceFolder) throws IOException {
+        for (String folderName : folderNames) {
+            final File subFolder = getSubFolder(sourceFolder, folderName);
+            subFolder.mkdir();
+
+            createImageFolderWithFiles(subFolder);
+
+            for (String subFolderName : subFolderNames) {
+                final File subSubFolder = getSubFolder(subFolder, subFolderName);
+
+                subSubFolder.mkdir();
+                createImageFolderWithFiles(subSubFolder);
+            }
+        }
+    }
+
     private void verifyImageFolder(final File subFolder, String folderName) {
         final File imageFolder = getSubFolder(subFolder, folderName);
         Assert.assertTrue(imageFolder.exists());
 
         for (String fileName : new String[]{"file1", "file2", "file3"}) {
-
             Assert.assertTrue(getSubFolder(imageFolder, fileName).exists());
         }
     }
@@ -426,7 +430,6 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         final File subSubFolder = getSubFolder(subFolder, "images");
         subSubFolder.mkdir();
         for (String fileName : new String[]{"file1", "file2", "file3"}) {
-
             getSubFolder(subSubFolder, fileName).createNewFile();
         }
         return subSubFolder;
