@@ -1,6 +1,6 @@
 package com.ruleoftech.markdown.page.generator.plugin;
 
-import com.vladsch.flexmark.Extension;
+import com.vladsch.flexmark.util.builder.Extension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.util.html.Attributes;
 import com.vladsch.flexmark.util.options.DataKey;
