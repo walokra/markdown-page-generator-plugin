@@ -6,7 +6,7 @@ import com.vladsch.flexmark.html.IndependentAttributeProviderFactory;
 import com.vladsch.flexmark.html.renderer.AttributablePart;
 import com.vladsch.flexmark.html.renderer.LinkResolverContext;
 import com.vladsch.flexmark.util.html.Attributes;
-import com.vladsch.flexmark.util.options.DataHolder;
+import com.vladsch.flexmark.util.data.DataHolder;
 
 import java.util.Map;
 
@@ -31,7 +31,7 @@ public class FlexmarkAttributeProvider implements AttributeProvider {
 
     public static class Factory extends IndependentAttributeProviderFactory {
         @Override
-        public AttributeProvider create(LinkResolverContext context) {
+        public AttributeProvider apply(LinkResolverContext context) {
             return new FlexmarkAttributeProvider(context);
         }
         
