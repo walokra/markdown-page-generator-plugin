@@ -4,7 +4,7 @@ import com.vladsch.flexmark.ast.Node;
 import com.vladsch.flexmark.html.AttributeProvider;
 import com.vladsch.flexmark.html.IndependentAttributeProviderFactory;
 import com.vladsch.flexmark.html.renderer.AttributablePart;
-import com.vladsch.flexmark.html.renderer.NodeRendererContext;
+import com.vladsch.flexmark.html.renderer.LinkResolverContext;
 import com.vladsch.flexmark.util.html.Attributes;
 import com.vladsch.flexmark.util.options.DataHolder;
 
@@ -14,7 +14,7 @@ public class FlexmarkAttributeProvider implements AttributeProvider {
 
     final protected Map<String, Attributes> attributeMap;
 
-    public FlexmarkAttributeProvider(NodeRendererContext context) {
+    public FlexmarkAttributeProvider(LinkResolverContext context) {
         DataHolder options = context.getOptions();
         attributeMap = options.get(AttributesExtension.ATTRIBUTE_MAP);
     }
@@ -31,8 +31,10 @@ public class FlexmarkAttributeProvider implements AttributeProvider {
 
     public static class Factory extends IndependentAttributeProviderFactory {
         @Override
-        public AttributeProvider create(NodeRendererContext context) {
+        public AttributeProvider create(LinkResolverContext context) {
             return new FlexmarkAttributeProvider(context);
         }
+        
+        
     }
 }
