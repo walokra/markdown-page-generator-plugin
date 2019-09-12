@@ -2,7 +2,7 @@
 
 Plugin creates static HTML pages with Maven and Markdown. Uses [flexmark-java] Markdown processor. The code is Open Source and under MIT license.
 
-[![Build Status](https://travis-ci.org/walokra/markdown-page-generator-plugin.svg?branch=master)](https://travis-ci.org/walokra/markdown-page-generator-plugin)
+[![CircleCI](https://circleci.com/gh/walokra/markdown-page-generator-plugin.svg?style=svg)](https://circleci.com/gh/walokra/markdown-page-generator-plugin)
 
 [![Maven Central status](https://img.shields.io/maven-central/v/com.ruleoftech/markdown-page-generator-plugin.svg)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.ruleoftech%22%20AND%20a%3A%22markdown-page-generator-plugin%22)
 
