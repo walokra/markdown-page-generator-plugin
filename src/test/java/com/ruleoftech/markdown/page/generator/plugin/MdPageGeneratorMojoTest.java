@@ -110,6 +110,19 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         assertTrue(markDown.contains("README.html"));
     }
 
+    public void testEmptyBasicProject() {
+        File pom = getTestFile("src/test/resources/empty-basic-project/pom.xml");
+        assertTrue(pom.exists());
+
+        try {
+            MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
+            assertNotNull(mdPageGeneratorMojo);
+            mdPageGeneratorMojo.execute();
+        } catch (final Exception e) {
+            assertTrue(e.toString(), false);
+        }
+    }
+
     public void testCustomAttributes() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/custom-attributes/target/html/README.html";
 
