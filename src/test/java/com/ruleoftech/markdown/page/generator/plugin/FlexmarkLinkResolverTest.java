@@ -28,6 +28,11 @@ public class FlexmarkLinkResolverTest extends BetterAbstractMojoTestCase {
             public Attributes extendRenderingNodeAttributes(AttributablePart part, Attributes attributes) {
                 return null;
             }
+            
+            @Override
+            public Attributes extendRenderingNodeAttributes(Node node, AttributablePart part, Attributes attributes) {
+            	return null;
+            }
 
             @Override
             public HtmlWriter getHtmlWriter() {
