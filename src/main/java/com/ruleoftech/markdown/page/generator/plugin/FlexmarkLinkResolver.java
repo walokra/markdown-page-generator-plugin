@@ -1,12 +1,12 @@
 package com.ruleoftech.markdown.page.generator.plugin;
 
-import com.vladsch.flexmark.ast.Node;
+import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.ext.wikilink.internal.WikiLinkLinkResolver;
 import com.vladsch.flexmark.html.IndependentLinkResolverFactory;
 import com.vladsch.flexmark.html.LinkResolver;
 import com.vladsch.flexmark.html.LinkResolverFactory;
 import com.vladsch.flexmark.html.renderer.*;
-import com.vladsch.flexmark.util.options.DataHolder;
+import com.vladsch.flexmark.util.data.DataHolder;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -52,7 +52,7 @@ public class FlexmarkLinkResolver implements LinkResolver {
         }
 
         @Override
-        public LinkResolver create(LinkResolverContext context) {
+        public LinkResolver apply(LinkResolverContext context) {
             return new FlexmarkLinkResolver(context);
         }
     }

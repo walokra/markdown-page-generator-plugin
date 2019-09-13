@@ -1,13 +1,13 @@
 package com.ruleoftech.markdown.page.generator.plugin;
 
-import com.vladsch.flexmark.Extension;
-import com.vladsch.flexmark.ast.Node;
+import com.vladsch.flexmark.util.builder.Extension;
+import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.profiles.pegdown.Extensions;
 import com.vladsch.flexmark.profiles.pegdown.PegdownOptionsAdapter;
 import com.vladsch.flexmark.util.html.Attributes;
-import com.vladsch.flexmark.util.options.MutableDataHolder;
+import com.vladsch.flexmark.util.data.MutableDataHolder;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.execution.MavenSession;

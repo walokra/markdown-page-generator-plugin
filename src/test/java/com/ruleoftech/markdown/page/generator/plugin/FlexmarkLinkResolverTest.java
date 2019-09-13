@@ -1,7 +1,7 @@
 package com.ruleoftech.markdown.page.generator.plugin;
 
-import com.vladsch.flexmark.ast.Document;
-import com.vladsch.flexmark.ast.Node;
+import com.vladsch.flexmark.util.ast.Document;
+import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.html.HtmlRendererOptions;
 import com.vladsch.flexmark.html.HtmlWriter;
 import com.vladsch.flexmark.html.renderer.AttributablePart;
@@ -10,8 +10,8 @@ import com.vladsch.flexmark.html.renderer.NodeRendererContext;
 import com.vladsch.flexmark.html.renderer.RenderingPhase;
 import com.vladsch.flexmark.html.renderer.ResolvedLink;
 import com.vladsch.flexmark.util.html.Attributes;
-import com.vladsch.flexmark.util.options.DataHolder;
-import com.vladsch.flexmark.util.options.MutableDataSet;
+import com.vladsch.flexmark.util.data.DataHolder;
+import com.vladsch.flexmark.util.data.MutableDataSet;
 
 import static com.ruleoftech.markdown.page.generator.plugin.PageGeneratorExtension.INPUT_FILE_EXTENSIONS;
 import static com.vladsch.flexmark.html.renderer.LinkType.LINK;
@@ -28,20 +28,25 @@ public class FlexmarkLinkResolverTest extends BetterAbstractMojoTestCase {
             public Attributes extendRenderingNodeAttributes(AttributablePart part, Attributes attributes) {
                 return null;
             }
+            
+            @Override
+            public Attributes extendRenderingNodeAttributes(Node node, AttributablePart part, Attributes attributes) {
+            	return null;
+            }
 
             @Override
             public HtmlWriter getHtmlWriter() {
                 return null;
             }
-
+            
             @Override
-            public NodeRendererContext getSubContext(Appendable out, boolean inheritIndent) {
-                return null;
+            public NodeRendererContext getSubContext(boolean inheritIndent) {
+            	return null;
             }
-
+            
             @Override
-            public NodeRendererContext getDelegatedSubContext(Appendable out, boolean inheritIndent) {
-                return null;
+            public NodeRendererContext getDelegatedSubContext(boolean inheritIndent) {
+            	return null;
             }
 
             @Override
