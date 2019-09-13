@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ruleoftech.test</groupId>
-    <artifactId>encoding-project</artifactId>
+    <artifactId>empty-basic-project</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Basic</name>
@@ -21,7 +21,7 @@
     <build>
 
         <!-- Added to keep everything out of the source tree -->
-        <directory>${project.basedir}/../../../../target/test-harness/encoding-project/target</directory>
+        <directory>${project.basedir}/../../../../target/test-harness/empty-basic-project/target</directory>
 
         <plugins>
             <plugin>
@@ -37,8 +37,6 @@
                 </executions>
                 <configuration>
                     <pegdownExtensions>TABLES</pegdownExtensions>
-                    <inputEncoding>UTF-8</inputEncoding>
-                    <outputEncoding>ISO-8859-15</outputEncoding>
                 </configuration>
             </plugin>
         </plugins>
