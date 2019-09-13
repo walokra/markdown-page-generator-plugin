@@ -1,13 +1,27 @@
 package com.ruleoftech.markdown.page.generator.plugin;
 
-import com.vladsch.flexmark.util.builder.Extension;
-import com.vladsch.flexmark.util.ast.Node;
-import com.vladsch.flexmark.html.HtmlRenderer;
-import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.profiles.pegdown.Extensions;
-import com.vladsch.flexmark.profiles.pegdown.PegdownOptionsAdapter;
-import com.vladsch.flexmark.util.html.Attributes;
-import com.vladsch.flexmark.util.data.MutableDataHolder;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.execution.MavenSession;
@@ -29,17 +43,16 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.util.StringUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.profiles.pegdown.Extensions;
+import com.vladsch.flexmark.profiles.pegdown.PegdownOptionsAdapter;
+import com.vladsch.flexmark.util.ast.Node;
+import com.vladsch.flexmark.util.builder.Extension;
+import com.vladsch.flexmark.util.data.DataKey;
+import com.vladsch.flexmark.util.data.MutableDataHolder;
+import com.vladsch.flexmark.util.data.MutableDataSet;
+import com.vladsch.flexmark.util.html.Attributes;
 
 /**
  * Creates a static html from markdown files.
@@ -107,52 +120,8 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     @Parameter(property = "generate.pegdownExtensions", defaultValue = "TABLES")
     private String pegdownExtensions;
 
-    private enum EPegdownExtensions {
-        NONE(Extensions.NONE),
-        SMARTS(Extensions.SMARTS),
-        QUOTES(Extensions.QUOTES),
-        SMARTYPANTS(Extensions.SMARTYPANTS),
-        ABBREVIATIONS(Extensions.ABBREVIATIONS),
-        HARDWRAPS(Extensions.HARDWRAPS),
-        AUTOLINKS(Extensions.AUTOLINKS),
-        TABLES(Extensions.TABLES),
-        DEFINITIONS(Extensions.DEFINITIONS),
-        FENCED_CODE_BLOCKS(Extensions.FENCED_CODE_BLOCKS),
-        WIKILINKS(Extensions.WIKILINKS),
-        STRIKETHROUGH(Extensions.STRIKETHROUGH),
-        ANCHORLINKS(Extensions.ANCHORLINKS),
-        ALL(Extensions.ALL),
-        SUPPRESS_HTML_BLOCKS(Extensions.SUPPRESS_HTML_BLOCKS),
-        SUPPRESS_INLINE_HTML(Extensions.SUPPRESS_INLINE_HTML),
-        SUPPRESS_ALL_HTML(Extensions.SUPPRESS_ALL_HTML),
-        ATXHEADERSPACE(Extensions.ATXHEADERSPACE),
-        SUBSCRIPT(Extensions.SUBSCRIPT),
-        RELAXEDHRULES(Extensions.RELAXEDHRULES),
-        TASKLISTITEMS(Extensions.TASKLISTITEMS),
-        EXTANCHORLINKS(Extensions.EXTANCHORLINKS),
-        EXTANCHORLINKS_WRAP(Extensions.EXTANCHORLINKS_WRAP),
-        FOOTNOTES(Extensions.FOOTNOTES),
-        TOC(Extensions.TOC),
-        MULTI_LINE_IMAGE_URLS(Extensions.MULTI_LINE_IMAGE_URLS),
-        SUPERSCRIPT(Extensions.SUPERSCRIPT),
-        FORCELISTITEMPARA(Extensions.FORCELISTITEMPARA),
-        INSERTED(Extensions.INSERTED),
-        ALL_OPTIONALS(Extensions.ALL_OPTIONALS),
-        ALL_WITH_OPTIONALS(Extensions.ALL_WITH_OPTIONALS),
-        GITHUB_DOCUMENT_COMPATIBLE(Extensions.GITHUB_DOCUMENT_COMPATIBLE),
-        GITHUB_WIKI_COMPATIBLE(Extensions.GITHUB_WIKI_COMPATIBLE),
-        GITHUB_COMMENT_COMPATIBLE(Extensions.GITHUB_COMMENT_COMPATIBLE);
-
-        private final int value;
-
-        EPegdownExtensions(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
-    }
+    @Parameter(property = "generate.flexmarkParserOptions")
+    private String flexmarkParserOptions;
 
     /**
      * Comma separated string of directories to be copied.
@@ -209,11 +178,12 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
         if (!markdownDTOs.isEmpty()) {
             getLog().info("Process Pegdown extension options");
-            int options = getPegdownExtensions(pegdownExtensions);
+            int pegdownOptions = getPegdownExtensions(pegdownExtensions);
+            MutableDataHolder flexmarkOptions = getFlexmarkParserOptions(flexmarkParserOptions);
             final Map<String, Attributes> attributesMap = processAttributes(attributes);
 
             getLog().info("Parse Markdown to HTML");
-            processMarkdown(markdownDTOs, options, attributesMap);
+            processMarkdown(markdownDTOs, pegdownOptions, flexmarkOptions, attributesMap);
         }
 
         // FIXME: This will possibly overwrite any filtering updates made in the maven property filtering step above
@@ -313,6 +283,9 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     }
 
     private int getPegdownExtensions(String extensions) {
+    	if (extensions == null)
+    		return 0;
+    	
         int options = 0;
         for (String ext : Arrays.asList(extensions.split("\\s*,\\s*"))) {
             try {
@@ -331,6 +304,31 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         getLog().info("Pegdown extension options = " + options);
 
         return options;
+    }
+
+    private <T> MutableDataHolder getFlexmarkParserOptions(String options) {
+        MutableDataHolder optionsAsDataKeys = new MutableDataSet();
+
+    	if (options == null)
+    		return optionsAsDataKeys;
+    	
+        for (String opt : Arrays.asList(options.split("\\s*,\\s*"))) {
+            try {
+                Field f = Parser.class.getField(opt);
+                @SuppressWarnings("unchecked")
+				DataKey<T> dataKey = (DataKey<T>)f.get(null);
+                optionsAsDataKeys.set(dataKey, dataKey.getDefaultValue(null));
+                getLog().info("Flexmark option " + opt);
+            } catch (NoSuchFieldException e) {
+                throw new IllegalArgumentException("No such option: " + opt);
+            } catch (IllegalAccessException e) {
+                throw new IllegalArgumentException("Cannot read object value for extension " + opt + ": " + e, e);
+            }
+        }
+
+        getLog().info("Flexmark option count = " + optionsAsDataKeys.keySet().size());
+
+        return optionsAsDataKeys;
     }
 
     /**
@@ -432,32 +430,37 @@ public class MdPageGeneratorMojo extends AbstractMojo {
      *
      * @throws MojoExecutionException Unable to write file
      */
-    private void processMarkdown(List<MarkdownDTO> markdownDTOs, int options, final Map<String, Attributes> attributesMap) throws MojoExecutionException {
+    private void processMarkdown(List<MarkdownDTO> markdownDTOs, int pegdownOptions, MutableDataHolder flexmarkOptions, final Map<String, Attributes> attributesMap) throws MojoExecutionException {
         getLog().debug("Process Markdown");
         getLog().debug("inputEncoding: '" + getInputEncoding() + "', outputEncoding: '" + getOutputEncoding() + "'");
         //getLog().debug("parsingTimeout: " + getParsingTimeoutInMillis() + " ms");
         getLog().debug("applyFiltering: " + applyFiltering);
 
-        MutableDataHolder flexmarkOptions = PegdownOptionsAdapter.flexmarkOptions(options).toMutable();
+        MutableDataHolder finalFlexmarkOptions = PegdownOptionsAdapter.flexmarkOptions(pegdownOptions).toMutable(); 
+        finalFlexmarkOptions.setAll(flexmarkOptions);
         ArrayList<Extension> extensions = new ArrayList<Extension>();
-        for (Extension extension : flexmarkOptions.get(Parser.EXTENSIONS)) {
+        for (Extension extension : finalFlexmarkOptions.get(Parser.EXTENSIONS)) {
             extensions.add(extension);
         }
 
         if (transformRelativeMarkdownLinks) {
-            flexmarkOptions.set(PageGeneratorExtension.INPUT_FILE_EXTENSIONS, inputFileExtensions);
+        	finalFlexmarkOptions.set(PageGeneratorExtension.INPUT_FILE_EXTENSIONS, inputFileExtensions);
             extensions.add(PageGeneratorExtension.create());
         }
 
         if (!attributesMap.isEmpty()) {
-            flexmarkOptions.set(AttributesExtension.ATTRIBUTE_MAP, attributesMap);
+        	finalFlexmarkOptions.set(AttributesExtension.ATTRIBUTE_MAP, attributesMap);
             extensions.add(AttributesExtension.create());
         }
 
-        flexmarkOptions.set(Parser.EXTENSIONS, extensions);
+        finalFlexmarkOptions.set(Parser.EXTENSIONS, extensions);
+        
+        getLog().info("final flexmark options: ");
+        for (DataKey<?> opt : finalFlexmarkOptions.keySet())
+        	getLog().info("  " + opt.getName());
 
-        Parser parser = Parser.builder(flexmarkOptions).build();
-        HtmlRenderer renderer = HtmlRenderer.builder(flexmarkOptions).build();
+        Parser parser = Parser.builder(finalFlexmarkOptions).build();
+        HtmlRenderer renderer = HtmlRenderer.builder(finalFlexmarkOptions).build();
 
         for (MarkdownDTO dto : markdownDTOs) {
             getLog().debug("dto: " + dto);
