@@ -197,6 +197,32 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- mvn test org.owasp:dependency-check-maven:check -->
+            <plugin>
+              <groupId>org.owasp</groupId>
+              <artifactId>dependency-check-maven</artifactId>
+              <version>5.3.0</version>
+              <executions>
+                  <execution>
+                      <goals>
+                          <goal>check</goal>
+                      </goals>
+                  </execution>
+              </executions>
+            </plugin>
+            <!-- mvn versions:display-dependency-updates -->
+            <!-- mvn versions:display-plugin-updates -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <allowAnyUpdates>false</allowAnyUpdates>
+                    <allowMajorUpdates>false</allowMajorUpdates>
+                    <allowMinorUpdates>false</allowMinorUpdates>
+                    <processDependencyManagement>false</processDependencyManagement>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
