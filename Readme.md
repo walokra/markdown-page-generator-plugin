@@ -12,7 +12,7 @@ Plugin Information:
 <plugin>
     <groupId>com.ruleoftech</groupId>
     <artifactId>markdown-page-generator-plugin</artifactId>
-    <version>2.1.0</version>
+    <version>2.2.0</version>
 </plugin>
 ```
 
@@ -268,7 +268,7 @@ Configuration options:
     ```markdown
     This paragraph has a footnote[^1] and another footnote[^two].
 
-    This one has more but out of sequence[^4] and[^eight]. 
+    This one has more but out of sequence[^4] and[^eight].
 
     [^two]: Footnote 2 with a bit more text
         and another continuation line
@@ -389,7 +389,7 @@ Or with custom header and footer:
 </plugin>
 ```
 
-You can also specify the Pegdown extensions:  
+You can also specify the Pegdown extensions:
 
 ```xml
 <plugin>
