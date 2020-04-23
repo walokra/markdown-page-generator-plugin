@@ -86,6 +86,9 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     @Parameter(property = "generate.inputFileExtensions", defaultValue = "md")
     private String inputFileExtensions = "md";
 
+    @Parameter(property = "generate.outputFileExtension", defaultValue = "html")
+    private String outputFileExtension = "html";
+
     @Parameter(property = "generate.applyFiltering", defaultValue = "false")
     private boolean applyFiltering;
 
@@ -333,12 +336,13 @@ public class MdPageGeneratorMojo extends AbstractMojo {
                 String inputFileExtension = FilenameUtils.getExtension(file.getName());
                 dto.htmlFile = new File(
                         recursiveInput
-                                ? outputDirectory + File.separator + file.getParentFile().getPath().substring(inputDirectory.getPath().length()) + File.separator + file.getName().replaceAll(
-                                "." + inputFileExtension,
-                                ".html"
-                        )
-                                : outputDirectory + File.separator + file.getName().replaceAll("." + inputFileExtension, ".html")
-                );
+                                ? outputDirectory + File.separator
+                                        + file.getParentFile().getPath().substring(inputDirectory.getPath().length())
+                                        + File.separator + file.getName().replaceAll(
+                                                "." + inputFileExtension,
+                                                "." + outputFileExtension)
+                                : outputDirectory + File.separator + file.getName().replaceAll("." + inputFileExtension,
+                                        "." + outputFileExtension));
 
                 getLog().debug("File htmlFile() " + dto.htmlFile);
 
