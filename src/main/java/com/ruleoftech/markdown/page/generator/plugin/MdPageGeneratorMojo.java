@@ -254,7 +254,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
      * @return map of Node class to attributable part and attributes
      */
     private Map<String, Attributes> processAttributes(String[] attributeList) {
-        HashMap<String, Attributes> nodeAttributeMap = new HashMap<>();
+        Map<String, Attributes> nodeAttributeMap = new HashMap<>();
 
         for (String attribute : attributeList) {
             String[] nodeAttributes = attribute.split("\\|");
@@ -281,9 +281,10 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     }
 
     private int getPegdownExtensions(String extensions) {
-    	if (extensions == null)
-    		return 0;
-    	
+    	if (extensions == null) {
+            return 0;
+        }
+
         int options = 0;
         for (String ext : Arrays.asList(extensions.split("\\s*,\\s*"))) {
             try {
@@ -309,7 +310,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
     	if (options == null)
     		return optionsAsDataKeys;
-    	
+
         for (String opt : Arrays.asList(options.split("\\s*,\\s*"))) {
             try {
                 Field f = Parser.class.getField(opt);
@@ -324,7 +325,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
             }
         }
 
-        getLog().info("Flexmark option count = " + optionsAsDataKeys.keySet().size());
+        getLog().info("Flexmark option count = " + optionsAsDataKeys.getKeys().size());
 
         return optionsAsDataKeys;
     }
@@ -379,6 +380,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
                 }
 
                 String inputFileExtension = FilenameUtils.getExtension(file.getName());
+
                 dto.htmlFile = new File(
                         recursiveInput
                                 ? outputDirectory + File.separator
@@ -434,9 +436,9 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         getLog().debug("inputEncoding: '" + getInputEncoding() + "', outputEncoding: '" + getOutputEncoding() + "'");
         getLog().debug("applyFiltering: " + applyFiltering);
 
-        MutableDataHolder finalFlexmarkOptions = PegdownOptionsAdapter.flexmarkOptions(pegdownOptions).toMutable(); 
+        MutableDataHolder finalFlexmarkOptions = PegdownOptionsAdapter.flexmarkOptions(pegdownOptions).toMutable();
         finalFlexmarkOptions.setAll(flexmarkOptions);
-        ArrayList<Extension> extensions = new ArrayList<Extension>();
+        List<Extension> extensions = new ArrayList<>();
         for (Extension extension : finalFlexmarkOptions.get(Parser.EXTENSIONS)) {
             extensions.add(extension);
         }
@@ -452,10 +454,11 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         }
 
         finalFlexmarkOptions.set(Parser.EXTENSIONS, extensions);
-        
+
         getLog().info("final flexmark options: ");
-        for (DataKey<?> opt : finalFlexmarkOptions.keySet())
-        	getLog().info("  " + opt.getName());
+        for (DataKey<?> opt : finalFlexmarkOptions.keySet()) {
+            getLog().info("  " + opt.getName());
+        }
 
         Parser parser = Parser.builder(finalFlexmarkOptions).build();
         HtmlRenderer renderer = HtmlRenderer.builder(finalFlexmarkOptions).build();
@@ -528,6 +531,10 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
     public String[] getInputFileExtensions() {
         return inputFileExtensions.trim().split("\\s*,\\s*");
+    }
+
+    public String[] getOutputFileExtensions() {
+        return outputFileExtension.trim().split("\\s*,\\s*");
     }
 
     /**
@@ -663,7 +670,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     }
 
     private List<File> getFilesAsArray(Iterator<File> iterator) {
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         while (iterator.hasNext()) {
             files.add(iterator.next());
         }
@@ -675,7 +682,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
      */
     private class MarkdownDTO {
         String title;
-        Map<String, String> substitutes = new HashMap<String, String>();
+        Map<String, String> substitutes = new HashMap<>();
         File htmlFile;
         File markdownFile;
         int folderDepth = 0;
@@ -685,7 +692,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
      * MAVEN RESOURCE FILTERING: Heavily borrowed from Apache Maven ResourcesMojo (https://maven.apache.org/plugins/maven-resources-plugin)
      **/
 
-    private List<MavenResourcesFiltering> mavenFilteringComponents = new ArrayList<MavenResourcesFiltering>();
+    private List<MavenResourcesFiltering> mavenFilteringComponents = new ArrayList<>();
     private PlexusContainer plexusContainer;
     private List<String> mavenFilteringHints;
 
@@ -733,7 +740,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         try {
             List<String> combinedFilters = getCombinedFiltersList();
 
-            List<Resource> resources = new ArrayList<Resource>();
+            List<Resource> resources = new ArrayList<>();
             final Resource resource = new Resource();
             resource.setFiltering(true);
             resource.setDirectory(inputDirectory.getAbsolutePath());

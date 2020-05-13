@@ -110,6 +110,45 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         assertTrue(markDown.contains("README.html"));
     }
 
+    public void testBasicProjectOutputExtension() throws Exception {
+        final String expectedGeneratedHTMLFile = "/target/test-harness/basic-project-output-extension/target/html/README.php";
+
+        File pom = getTestFile("src/test/resources/basic-project-output-extension/pom.xml");
+        assertTrue(pom.exists());
+
+        MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
+        assertNotNull(mdPageGeneratorMojo);
+
+        mdPageGeneratorMojo.execute();
+
+        File generatedMarkdown = new File(getBasedir(), expectedGeneratedHTMLFile);
+        assertTrue("Expected HTML file does not exist: " + generatedMarkdown, generatedMarkdown.exists());
+
+        String markDown = FileUtils.readFileToString(generatedMarkdown, "ISO-8859-15");
+        assertNotNull(markDown);
+        // TODO: resulted HTML should have self links with output file extension
+        //  assertTrue(markDown.contains("README." + mdPageGeneratorMojo.getOutputFileExtensions()));
+    }
+
+    public void testBasicProjectFlexmarkOption() throws Exception {
+        final String expectedGeneratedHTMLFile = "/target/test-harness/basic-project-flexmark-option/target/html/README.html";
+
+        File pom = getTestFile("src/test/resources/basic-project-flexmark-option/pom.xml");
+        assertTrue(pom.exists());
+
+        MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
+        assertNotNull(mdPageGeneratorMojo);
+
+        mdPageGeneratorMojo.execute();
+
+        File generatedMarkdown = new File(getBasedir(), expectedGeneratedHTMLFile);
+        assertTrue("Expected HTML file does not exist: " + generatedMarkdown, generatedMarkdown.exists());
+
+        String markDown = FileUtils.readFileToString(generatedMarkdown, "ISO-8859-15");
+        assertNotNull(markDown);
+        assertTrue(markDown.contains("<ol start=\"3\">"));
+    }
+
     public void testEmptyBasicProject() {
         File pom = getTestFile("src/test/resources/empty-basic-project/pom.xml");
         assertTrue(pom.exists());
