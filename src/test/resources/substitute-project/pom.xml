@@ -40,6 +40,7 @@
                     <footerHtmlFile>${basedir}/src/main/resources/markdown/html/footer.html</footerHtmlFile>
                     <applyFiltering>true</applyFiltering>
                     <pegdownExtensions>TABLES</pegdownExtensions>
+                    <flexmarkParserOptions>LISTS_ORDERED_LIST_MANUAL_START</flexmarkParserOptions>
                 </configuration>
             </plugin>
         </plugins>
