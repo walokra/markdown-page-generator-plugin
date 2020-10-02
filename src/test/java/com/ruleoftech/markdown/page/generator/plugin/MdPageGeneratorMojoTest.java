@@ -430,6 +430,31 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
 
     }
 
+    public void testCodeBlockProject() throws Exception {
+        final String expectedGeneratedHTMLFile = "/target/test-harness/codeblock-project/target/html/README.html";
+
+        File pom = getTestFile("src/test/resources/codeblock-project/pom.xml");
+        assertTrue(pom.exists());
+
+        MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
+        assertNotNull(mdPageGeneratorMojo);
+
+        mdPageGeneratorMojo.execute();
+
+        File generatedMarkdown = new File(getBasedir(), expectedGeneratedHTMLFile);
+        assertTrue("Expected HTML file does not exist: " + generatedMarkdown, generatedMarkdown.exists());
+
+      String html = FileUtils.readFileToString(generatedMarkdown, Charset.defaultCharset());
+
+        assertEquals("<h1>Lorem ipsum</h1>\n"
+                + "<pre><code>&lt;dependency&gt;\n"
+                + "    &lt;groupId&gt;groupid&lt;/groupId&gt;\n"
+                + "    &lt;artifactId&gt;artifactid&lt;/artifactId&gt;\n"
+                + "    &lt;version&gt;version&lt;/version&gt;\n"
+                + "&lt;/dependency&gt;\n"
+                + "</code></pre>\n", html);
+    }
+
     private void createSubFoldersAndFiles(String[] folderNames, String[] fileNames, File sourceFolder) throws IOException {
         for (String folderName : folderNames) {
             final File subFolder = getSubFolder(sourceFolder, folderName);
