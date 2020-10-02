@@ -386,10 +386,10 @@ public class MdPageGeneratorMojo extends AbstractMojo {
                                 ? outputDirectory + File.separator
                                         + file.getParentFile().getPath().substring(inputDirectory.getPath().length())
                                         + File.separator + file.getName().replaceAll(
-                                                "." + inputFileExtension,
-                                                "." + outputFileExtension)
-                                : outputDirectory + File.separator + file.getName().replaceAll("." + inputFileExtension,
-                                        "." + outputFileExtension));
+                                                "\\." + inputFileExtension,
+                                                "\\." + outputFileExtension)
+                                : outputDirectory + File.separator + file.getName().replaceAll("\\." + inputFileExtension,
+                                        "\\." + outputFileExtension));
 
                 getLog().debug("File htmlFile() " + dto.htmlFile);
 
