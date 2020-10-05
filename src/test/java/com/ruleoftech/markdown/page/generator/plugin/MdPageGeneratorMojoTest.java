@@ -430,10 +430,53 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
 
     }
 
+    @Test
     public void testFilenameProject() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/filename-project/target/html/stammdaten.html";
 
         File pom = getTestFile("src/test/resources/filename-project/pom.xml");
+        assertTrue(pom.exists());
+
+        MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
+        assertNotNull(mdPageGeneratorMojo);
+
+        mdPageGeneratorMojo.execute();
+
+        File generatedMarkdown = new File(getBasedir(), expectedGeneratedHTMLFile);
+        assertTrue("Expected HTML file does not exist: " + generatedMarkdown, generatedMarkdown.exists());
+    }
+
+    @Test
+    public void testCodeBlockProject() throws Exception {
+        final String expectedGeneratedHTMLFile = "/target/test-harness/codeblock-project/target/html/README.html";
+
+        File pom = getTestFile("src/test/resources/codeblock-project/pom.xml");
+        assertTrue(pom.exists());
+
+        MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
+        assertNotNull(mdPageGeneratorMojo);
+
+        mdPageGeneratorMojo.execute();
+
+        File generatedMarkdown = new File(getBasedir(), expectedGeneratedHTMLFile);
+        assertTrue("Expected HTML file does not exist: " + generatedMarkdown, generatedMarkdown.exists());
+
+      String html = FileUtils.readFileToString(generatedMarkdown, Charset.defaultCharset());
+
+        assertEquals("<h1>Lorem ipsum</h1>\n"
+                + "<pre><code>&lt;dependency&gt;\n"
+                + "    &lt;groupId&gt;groupid&lt;/groupId&gt;\n"
+                + "    &lt;artifactId&gt;artifactid&lt;/artifactId&gt;\n"
+                + "    &lt;version&gt;version&lt;/version&gt;\n"
+                + "&lt;/dependency&gt;\n"
+                + "</code></pre>\n", html);
+    }
+
+    @Test
+    public void testExampleProject() throws Exception {
+        final String expectedGeneratedHTMLFile = "/target/test-harness/example-project/target/html/README.html";
+
+        File pom = getTestFile("src/test/resources/example-project/pom.xml");
         assertTrue(pom.exists());
 
         MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
