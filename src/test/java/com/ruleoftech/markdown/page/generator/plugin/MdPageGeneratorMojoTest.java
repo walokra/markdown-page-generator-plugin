@@ -430,6 +430,23 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
 
     }
 
+    @Test
+    public void testFilenameProject() throws Exception {
+        final String expectedGeneratedHTMLFile = "/target/test-harness/filename-project/target/html/stammdaten.html";
+
+        File pom = getTestFile("src/test/resources/filename-project/pom.xml");
+        assertTrue(pom.exists());
+
+        MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
+        assertNotNull(mdPageGeneratorMojo);
+
+        mdPageGeneratorMojo.execute();
+
+        File generatedMarkdown = new File(getBasedir(), expectedGeneratedHTMLFile);
+        assertTrue("Expected HTML file does not exist: " + generatedMarkdown, generatedMarkdown.exists());
+    }
+
+    @Test
     public void testCodeBlockProject() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/codeblock-project/target/html/README.html";
 
