@@ -17,6 +17,7 @@ import java.util.Iterator;
  */
 public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
 
+    @Test
     public void testEncoding() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/encoding-project/target/html/README.html";
 
@@ -55,6 +56,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
 
     }
 
+    @Test
     public void testBasicProject() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/basic-project/target/html/README.html";
 
@@ -70,6 +72,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         assertTrue("Expected HTML file does not exist: " + generatedMarkdown, generatedMarkdown.exists());
     }
 
+    @Test
     public void testBasicProjectWithRenamedInOutDirectories() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/basic-project-custom-inout-directories/target/html-renamed/README.html";
         final String notExpectedGeneratedHTMLFile = "/target/test-harness/basic-project-custom-inout-directories/target/html/README.html";
@@ -87,9 +90,29 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
 
         File notGeneratedMarkdown = new File(getBasedir(), notExpectedGeneratedHTMLFile);
         assertFalse("Unexpected HTML file exist: " + notGeneratedMarkdown, notGeneratedMarkdown.exists());
-
     }
 
+    @Test
+    public void testCustomInOutDirectories() throws Exception {
+        final String expectedGeneratedHTMLFile = "/target/test-harness/custom-inout-directories-project/target/docs/README.html";
+        final String notExpectedGeneratedHTMLFile = "/target/test-harness/custom-inout-directories-project/target/html/README.html";
+
+        File pom = getTestFile("src/test/resources/custom-inout-directories-project/pom.xml");
+        assertTrue(pom.exists());
+
+        MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
+        assertNotNull(mdPageGeneratorMojo);
+
+        mdPageGeneratorMojo.execute();
+
+        File generatedMarkdown = new File(getBasedir(), expectedGeneratedHTMLFile);
+        assertTrue("Expected HTML file does not exist: " + generatedMarkdown, generatedMarkdown.exists());
+
+        File notGeneratedMarkdown = new File(getBasedir(), notExpectedGeneratedHTMLFile);
+        assertFalse("Unexpected HTML file exist: " + notGeneratedMarkdown, notGeneratedMarkdown.exists());
+    }
+
+    @Test
     public void testBasicProjectExtension() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/basic-project-extension/target/html/README.html";
 
@@ -110,6 +133,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         assertTrue(markDown.contains("README.html"));
     }
 
+    @Test
     public void testBasicProjectOutputExtension() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/basic-project-output-extension/target/html/README.php";
 
@@ -130,6 +154,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         //  assertTrue(markDown.contains("README." + mdPageGeneratorMojo.getOutputFileExtensions()));
     }
 
+    @Test
     public void testBasicProjectFlexmarkOption() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/basic-project-flexmark-option/target/html/README.html";
 
@@ -149,6 +174,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         assertTrue(markDown.contains("<ol start=\"3\">"));
     }
 
+    @Test
     public void testEmptyBasicProject() {
         File pom = getTestFile("src/test/resources/empty-basic-project/pom.xml");
         assertTrue(pom.exists());
@@ -162,6 +188,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         }
     }
 
+    @Test
     public void testCustomAttributes() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/custom-attributes/target/html/README.html";
 
@@ -203,6 +230,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
                 + "</blockquote>\n", markDown);
     }
 
+    @Test
     public void testRecursiveProject() throws Exception {
         final String expectedGeneratedHTMLFileBaseDir = "/target/test-harness/recursive-project/target/html/";
 
@@ -244,6 +272,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
     //    }
     //}
 
+    @Test
     public void testSubstituteProject() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/substitute-project/target/html/README.html";
 
@@ -486,6 +515,22 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
 
         File generatedMarkdown = new File(getBasedir(), expectedGeneratedHTMLFile);
         assertTrue("Expected HTML file does not exist: " + generatedMarkdown, generatedMarkdown.exists());
+    }
+
+    @Test
+    public void testMultimoduleProject() throws Exception {
+        final String expectedGeneratedHTMLFileBaseDir = "/target/test-harness/multimodule-project/target/docs/";
+
+        File pom = getTestFile("src/test/resources/multimodule-project/pom.xml");
+        assertTrue(pom.exists());
+
+        MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
+        assertNotNull(mdPageGeneratorMojo);
+
+        mdPageGeneratorMojo.execute();
+
+        File index = new File(getBasedir(), expectedGeneratedHTMLFileBaseDir + "README.html");
+        assertTrue(index.exists());
     }
 
     private void createSubFoldersAndFiles(String[] folderNames, String[] fileNames, File sourceFolder) throws IOException {

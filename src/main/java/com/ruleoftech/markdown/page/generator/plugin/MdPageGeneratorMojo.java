@@ -176,9 +176,9 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
         getLog().info("Pre-processing markdown files from input directory: " + inputDirectory);
         if (!preprocessMarkdownFiles(new File(inputDirectory))){
-			getLog().info("Pre-processing markdown files from input directory: markdown files not found" + inputDirectory);
-			return;
-		}
+			    getLog().info("Pre-processing markdown files from input directory: markdown files not found" + inputDirectory);
+			    return;
+		    }
 
         if (!markdownDTOs.isEmpty()) {
             getLog().info("Process Pegdown extension options");
