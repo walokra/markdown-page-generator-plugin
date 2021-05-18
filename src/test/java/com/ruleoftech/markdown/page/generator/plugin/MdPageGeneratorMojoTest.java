@@ -517,22 +517,6 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         assertTrue("Expected HTML file does not exist: " + generatedMarkdown, generatedMarkdown.exists());
     }
 
-    @Test
-    public void testMultimoduleProject() throws Exception {
-        final String expectedGeneratedHTMLFileBaseDir = "/target/test-harness/multimodule-project/target/docs/";
-
-        File pom = getTestFile("src/test/resources/multimodule-project/pom.xml");
-        assertTrue(pom.exists());
-
-        MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
-        assertNotNull(mdPageGeneratorMojo);
-
-        mdPageGeneratorMojo.execute();
-
-        File index = new File(getBasedir(), expectedGeneratedHTMLFileBaseDir + "README.html");
-        assertTrue(index.exists());
-    }
-
     private void createSubFoldersAndFiles(String[] folderNames, String[] fileNames, File sourceFolder) throws IOException {
         for (String folderName : folderNames) {
             final File subFolder = getSubFolder(sourceFolder, folderName);
