@@ -57,7 +57,7 @@ import com.vladsch.flexmark.util.html.Attributes;
 /**
  * Creates a static html from markdown files.
  */
-@Mojo(name = "generate")
+@Mojo(name = "generate", threadSafe = true)
 public class MdPageGeneratorMojo extends AbstractMojo {
 
     @Parameter(property = "generate.defaultTitle")
