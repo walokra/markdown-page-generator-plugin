@@ -455,11 +455,13 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
         finalFlexmarkOptions.set(Parser.EXTENSIONS, extensions);
 
-        getLog().info("final flexmark options: ");
+        StringBuilder finalOptions = new StringBuilder("final flexmark options: ");
         for (DataKey<?> opt : finalFlexmarkOptions.keySet()) {
-            getLog().info("  " + opt.getName());
+            finalOptions.append(opt.getName());
+            finalOptions.append(" ");
         }
-
+        getLog().debug(finalOptions.toString());
+        
         Parser parser = Parser.builder(finalFlexmarkOptions).build();
         HtmlRenderer renderer = HtmlRenderer.builder(finalFlexmarkOptions).build();
 
