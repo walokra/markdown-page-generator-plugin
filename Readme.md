@@ -30,7 +30,7 @@ Default configuration which can be overridden:
 
 Configuration options:
 
-* variables substitution
+* `applyFiltering`: apply variables substitution if `true`. Default `false`.
 
   Example:
 
@@ -47,7 +47,8 @@ Configuration options:
   `page.md`:
 
   ```markdown
-  # Title {lang=en}
+  # Title 
+  {lang=en}
   ```
 
   will output in `page.html`:
