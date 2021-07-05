@@ -123,8 +123,13 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     @Parameter(property = "generate.pegdownExtensions", defaultValue = "TABLES")
     private String pegdownExtensions;
 
+    // https://github.com/vsch/flexmark-java/wiki/Extensions#parser
     @Parameter(property = "generate.flexmarkParserOptions")
     private String flexmarkParserOptions;
+
+    // https://github.com/vsch/flexmark-java/wiki/Extensions#renderer
+    @Parameter(property = "generate.flexmarkRendererOptions")
+    private String flexmarkRendererOptions;
 
     /**
      * Comma separated string of directories to be copied.
@@ -183,11 +188,12 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         if (!markdownDTOs.isEmpty()) {
             getLog().info("Process Pegdown extension options");
             int pegdownOptions = getPegdownExtensions(pegdownExtensions);
-            MutableDataHolder flexmarkOptions = getFlexmarkParserOptions(flexmarkParserOptions);
+            MutableDataHolder flexmarkParserOptions = getFlexmarkParserOptions(this.flexmarkParserOptions);
+            MutableDataHolder flexmarkRendererOptions = getFlexmarkRendererOptions(this.flexmarkRendererOptions);
             final Map<String, Attributes> attributesMap = processAttributes(attributes);
 
             getLog().info("Parse Markdown to HTML");
-            processMarkdown(markdownDTOs, pegdownOptions, flexmarkOptions, attributesMap);
+            processMarkdown(markdownDTOs, pegdownOptions, flexmarkParserOptions, flexmarkRendererOptions, attributesMap);
         }
 
         // FIXME: This will possibly overwrite any filtering updates made in the maven property filtering step above
@@ -286,7 +292,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
         }
 
         int options = 0;
-        for (String ext : Arrays.asList(extensions.split("\\s*,\\s*"))) {
+        for (String ext : extensions.split("\\s*,\\s*")) {
             try {
                 if (!ext.isEmpty()) {
                     Field f = Extensions.class.getField(ext);
@@ -311,15 +317,40 @@ public class MdPageGeneratorMojo extends AbstractMojo {
     	if (options == null)
     		return optionsAsDataKeys;
 
-        for (String opt : Arrays.asList(options.split("\\s*,\\s*"))) {
+        for (String opt : options.split("\\s*,\\s*")) {
             try {
                 Field f = Parser.class.getField(opt);
                 @SuppressWarnings("unchecked")
 				DataKey<T> dataKey = (DataKey<T>)f.get(null);
                 optionsAsDataKeys.set(dataKey, dataKey.getDefaultValue(null));
-                getLog().info("Flexmark option " + opt);
+                getLog().info("Flexmark parser option " + opt);
             } catch (NoSuchFieldException e) {
-                throw new IllegalArgumentException("No such option: " + opt);
+                throw new IllegalArgumentException("No such parser option: " + opt);
+            } catch (IllegalAccessException e) {
+                throw new IllegalArgumentException("Cannot read object value for extension " + opt + ": " + e, e);
+            }
+        }
+
+        getLog().info("Flexmark option count = " + optionsAsDataKeys.getKeys().size());
+
+        return optionsAsDataKeys;
+    }
+
+    private <T> MutableDataHolder getFlexmarkRendererOptions(String options) {
+        MutableDataHolder optionsAsDataKeys = new MutableDataSet();
+
+        if (options == null)
+            return optionsAsDataKeys;
+
+        for (String opt : options.split("\\s*,\\s*")) {
+            try {
+                Field f = HtmlRenderer.class.getField(opt);
+                @SuppressWarnings("unchecked")
+                DataKey<T> dataKey = (DataKey<T>)f.get(null);
+                optionsAsDataKeys.set(dataKey, dataKey.getDefaultValue(null));
+                getLog().info("Flexmark renderer option " + opt);
+            } catch (NoSuchFieldException e) {
+                throw new IllegalArgumentException("No such renderer option: " + opt);
             } catch (IllegalAccessException e) {
                 throw new IllegalArgumentException("Cannot read object value for extension " + opt + ": " + e, e);
             }
@@ -431,13 +462,19 @@ public class MdPageGeneratorMojo extends AbstractMojo {
      *
      * @throws MojoExecutionException Unable to write file
      */
-    private void processMarkdown(List<MarkdownDTO> markdownDTOs, int pegdownOptions, MutableDataHolder flexmarkOptions, final Map<String, Attributes> attributesMap) throws MojoExecutionException {
+    private void processMarkdown(List<MarkdownDTO> markdownDTOs,
+                                 int pegdownOptions,
+                                 MutableDataHolder flexmarkParserOptions,
+                                 MutableDataHolder flexmarkRendererOptions,
+                                 final Map<String, Attributes> attributesMap
+    ) throws MojoExecutionException {
         getLog().debug("Process Markdown");
         getLog().debug("inputEncoding: '" + getInputEncoding() + "', outputEncoding: '" + getOutputEncoding() + "'");
         getLog().debug("applyFiltering: " + applyFiltering);
 
         MutableDataHolder finalFlexmarkOptions = PegdownOptionsAdapter.flexmarkOptions(pegdownOptions).toMutable();
-        finalFlexmarkOptions.setAll(flexmarkOptions);
+        finalFlexmarkOptions.setAll(flexmarkParserOptions);
+        finalFlexmarkOptions.setAll(flexmarkRendererOptions);
         List<Extension> extensions = new ArrayList<>();
         for (Extension extension : finalFlexmarkOptions.get(Parser.EXTENSIONS)) {
             extensions.add(extension);
