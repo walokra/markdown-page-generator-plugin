@@ -476,6 +476,46 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
     }
 
     @Test
+    public void testFlexmarkOptionsProject() throws Exception {
+        final String expectedGeneratedHTMLFile = "/target/test-harness/flexmark-options-project/target/html/README.html";
+
+        File pom = getTestFile("src/test/resources/flexmark-options-project/pom.xml");
+        assertTrue(pom.exists());
+
+        MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
+        assertNotNull(mdPageGeneratorMojo);
+
+        mdPageGeneratorMojo.execute();
+
+        File generatedMarkdown = new File(getBasedir(), expectedGeneratedHTMLFile);
+        assertTrue("Expected HTML file does not exist: " + generatedMarkdown, generatedMarkdown.exists());
+
+        String html = FileUtils.readFileToString(generatedMarkdown, Charset.defaultCharset());
+
+        assertEquals("<h1><a href=\"#table-of-content\" id=\"table-of-content\"></a>Table of content</h1>\n"
+                + "<ul>\n"
+                + "<li><a href=\"#first-header\">First header</a>\n"
+                + "<ul>\n"
+                + "<li><a href=\"#something\">Something</a></li>\n"
+                + "<li><a href=\"#something-else\">Something else</a></li>\n"
+                + "</ul>\n"
+                + "</li>\n"
+                + "<li><a href=\"#second-header\">Second header</a>\n"
+                + "<ul>\n"
+                + "<li><a href=\"#something-1\">Something</a></li>\n"
+                + "<li><a href=\"#something-else-1\">Something else</a></li>\n"
+                + "</ul>\n"
+                + "</li>\n"
+                + "</ul>\n"
+                + "<h2><a href=\"#first-header\" id=\"first-header\"></a>First header</h2>\n"
+                + "<h3><a href=\"#something\" id=\"something\"></a>Something</h3>\n"
+                + "<h3><a href=\"#something-else\" id=\"something-else\"></a>Something else</h3>\n"
+                + "<h2><a href=\"#second-header\" id=\"second-header\"></a>Second header</h2>\n"
+                + "<h3><a href=\"#something-1\" id=\"something-1\"></a>Something</h3>\n"
+                + "<h3><a href=\"#something-else-1\" id=\"something-else-1\"></a>Something else</h3>\n", html);
+    }
+
+    @Test
     public void testCodeBlockProject() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/codeblock-project/target/html/README.html";
 
@@ -490,7 +530,7 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         File generatedMarkdown = new File(getBasedir(), expectedGeneratedHTMLFile);
         assertTrue("Expected HTML file does not exist: " + generatedMarkdown, generatedMarkdown.exists());
 
-      String html = FileUtils.readFileToString(generatedMarkdown, Charset.defaultCharset());
+        String html = FileUtils.readFileToString(generatedMarkdown, Charset.defaultCharset());
 
         assertEquals("<h1>Lorem ipsum</h1>\n"
                 + "<pre><code>&lt;dependency&gt;\n"

@@ -498,7 +498,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
             finalOptions.append(" ");
         }
         getLog().debug(finalOptions.toString());
-        
+
         Parser parser = Parser.builder(finalFlexmarkOptions).build();
         HtmlRenderer renderer = HtmlRenderer.builder(finalFlexmarkOptions).build();
 
