@@ -18,6 +18,34 @@ import java.util.Iterator;
 public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
 
     @Test
+    public void testRemoveHeaders() throws Exception {
+        final String expectedGeneratedHTMLFile = "/target/test-harness/basic-project-headers/target/html/README.html";
+        final String expectedGeneratedNoHeaderHTMLFile = "/target/test-harness/basic-project-headers/target/html/NO_HEADER.html";
+        final String expectedGeneratedHTMLContent = FileUtils.readFileToString(new File("src/test/resources/basic-project-headers/README.html"));
+
+        File pom = getTestFile("src/test/resources/basic-project-headers/pom.xml");
+        assertTrue(pom.exists());
+
+        MdPageGeneratorMojo mdPageGeneratorMojo = (MdPageGeneratorMojo) lookupConfiguredMojo(pom, "generate");
+        assertNotNull(mdPageGeneratorMojo);
+
+        mdPageGeneratorMojo.execute();
+
+        File generatedMarkdown = new File(getBasedir(), expectedGeneratedHTMLFile);
+        assertTrue("Expected HTML file does not exist: " + generatedMarkdown, generatedMarkdown.exists());
+
+        File generatedNoHeaderMarkdown = new File(getBasedir(), expectedGeneratedNoHeaderHTMLFile);
+        assertTrue("Expected HTML file without header does not exist: " + generatedNoHeaderMarkdown, generatedNoHeaderMarkdown.exists());
+
+        String htmlContent = FileUtils.readFileToString(generatedMarkdown);
+        assertEquals(expectedGeneratedHTMLContent, htmlContent);
+
+        String htmlContentNoHeader = FileUtils.readFileToString(generatedNoHeaderMarkdown);
+        assertEquals(expectedGeneratedHTMLContent, htmlContentNoHeader);
+
+    }
+
+        @Test
     public void testEncoding() throws Exception {
         final String expectedGeneratedHTMLFile = "/target/test-harness/encoding-project/target/html/README.html";
 
