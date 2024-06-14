@@ -322,6 +322,17 @@ Configuration options:
 
   * `INSERTED`: inserted or underlined extension `++inserted++`
 
+* `removeMarkdownHeaders`: Remove headers on top of markdown files if exists.
+  ```markdown
+  ---
+  Header information
+  title: Title
+  ...
+  ---
+  Markdown Content
+  ...
+  ```
+
 * `inputFileExtensions`: Comma-separated input file extensions (auto trim included), default:
   `md`
 

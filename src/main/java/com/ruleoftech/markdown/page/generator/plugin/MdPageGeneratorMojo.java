@@ -8,7 +8,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -80,6 +79,9 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
     @Parameter(property = "generate.failIfFilesAreMissing", defaultValue = "true")
     private boolean failIfFilesAreMissing;
+
+    @Parameter(property = "generate.removeMarkdownHeaders", defaultValue = "false")
+    private boolean removeMarkdownHeaders;
 
     @Parameter(property = "generate.recursiveInput", defaultValue = "false")
     private boolean recursiveInput;
@@ -534,6 +536,9 @@ public class MdPageGeneratorMojo extends AbstractMojo {
                 }
 
                 String markdown = FileUtils.readFileToString(dto.markdownFile, getInputEncoding());
+                if (removeMarkdownHeaders) {
+                    markdown = removeMarkdownHeader(markdown);
+                }
                 markdown = replaceVariables(markdown, dto.substitutes);
 
                 String markdownAsHtml;
@@ -549,6 +554,19 @@ public class MdPageGeneratorMojo extends AbstractMojo {
                 getLog().error("Error : " + e.getMessage(), e);
                 throw new MojoExecutionException("Unable to write file " + e.getMessage(), e);
             }
+        }
+    }
+
+    private String removeMarkdownHeader(String markdown) {
+
+        Matcher matcher = Pattern.compile("^---\\s*\n(.*?)\n---\\s*\n(.*?)$", Pattern.DOTALL).matcher(markdown);
+        if (!matcher.find()) {
+            return markdown;
+        }
+        try {
+            return matcher.group(2);
+        } catch (IllegalArgumentException e) {
+            return markdown;
         }
     }
 
