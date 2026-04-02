@@ -13,6 +13,9 @@ concurrency:
 jobs:
   publish-snapshot:
     runs-on: ubuntu-latest
+    env:
+      CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
+      CENTRAL_PORTAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
 
     steps:
       - name: Checkout code
@@ -28,6 +31,13 @@ jobs:
           server-username: CENTRAL_PORTAL_USERNAME
           server-password: CENTRAL_PORTAL_PASSWORD
 
+      - name: Verify publishing credentials
+        run: |
+          if [[ -z "${CENTRAL_PORTAL_USERNAME}" || -z "${CENTRAL_PORTAL_PASSWORD}" ]]; then
+            echo "Central Portal credentials are not configured for this workflow." >&2
+            exit 1
+          fi
+
       - name: Verify snapshot version
         run: |
           PROJECT_VERSION="$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)"
@@ -39,7 +49,4 @@ jobs:
           fi
 
       - name: Publish snapshot to Central Publisher Portal
-        env:
-          CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
-          CENTRAL_PORTAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
         run: mvn -B -ntp deploy
