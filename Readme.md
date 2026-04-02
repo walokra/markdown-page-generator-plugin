@@ -16,9 +16,24 @@ Plugin Information:
 </plugin>
 ```
 
+Plugin in maven central repository:
+* [Maven Central](https://central.sonatype.com/artifact/com.ruleoftech/markdown-page-generator-plugin)
+
 Artifacts:
-* [Snapshots](https://oss.sonatype.org/content/repositories/snapshots/com/ruleoftech/markdown-page-generator-plugin/)
-* [Releases](https://oss.sonatype.org/content/repositories/releases/com/ruleoftech/markdown-page-generator-plugin/)
+* [Snapshots](https://central.sonatype.com/repository/maven-snapshots/com/ruleoftech/markdown-page-generator-plugin/)
+* [Releases](https://central.sonatype.com/artifact/com.ruleoftech/markdown-page-generator-plugin)
+
+## Publishing
+
+### Snapshots
+
+GitHub Actions workflow [publish-snapshot.yml](.github/workflows/publish-snapshot.yml) publishes `-SNAPSHOT` versions from `master` to the Central Publisher Portal.
+
+### Releases
+
+GitHub Actions workflow [publish-release.yml](.github/workflows/publish-release.yml) publishes signed release versions from Git tags to the Central Publisher Portal.
+
+## Configuration options
 
 You can configure the input and output directories, which files to copy and which pegdown
 options are used. You can also include custom header and footer and general title.
