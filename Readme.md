@@ -27,11 +27,11 @@ Artifacts:
 
 ### Snapshots
 
-GitHub Actions workflow [publish-snapshot.yml](.github/workflows/publish-snapshot.yml) publishes `-SNAPSHOT` versions from `master` to the Central Publisher Portal.
+GitHub Actions workflow [publish-snapshot.yml](.github/workflows/publish-snapshot.yml) publishes `-SNAPSHOT` versions to the Central Publisher Portal when triggered manually.
 
 ### Releases
 
-GitHub Actions workflow [publish-release.yml](.github/workflows/publish-release.yml) publishes signed release versions from Git tags to the Central Publisher Portal.
+GitHub Actions workflow [publish-release.yml](.github/workflows/publish-release.yml) publishes signed release versions to the Central Publisher Portal when triggered manually.
 
 ## Configuration options
 
