@@ -31,7 +31,9 @@ GitHub Actions workflow [publish-snapshot.yml](.github/workflows/publish-snapsho
 
 ### Releases
 
-GitHub Actions workflow [publish-release.yml](.github/workflows/publish-release.yml) publishes signed release versions to the Central Publisher Portal when triggered manually.
+GitHub Actions workflow [publish-release.yml](.github/workflows/publish-release.yml) prepares a release when triggered manually. It runs `mvn release:clean release:prepare`, commits the release version changes, creates the release tag, and updates the branch to the next development version.
+
+GitHub Actions workflow [perform-release.yml](.github/workflows/perform-release.yml) performs the prepared release from a given Git tag when triggered manually. It runs `mvn release:perform` and deploys the signed release artifacts to the Central Publisher Portal.
 
 ## Configuration options
 

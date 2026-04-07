@@ -1,0 +1,91 @@
+name: Perform Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag created by the prepare workflow, for example 2.4.4
+        required: true
+        type: string
+      dry_run:
+        description: Validate the release perform step without deploying artifacts
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: perform-release-${{ github.ref }}-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  perform-release:
+    runs-on: ubuntu-latest
+    env:
+      CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
+      CENTRAL_PORTAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v5
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+          server-id: ossrh
+          server-username: CENTRAL_PORTAL_USERNAME
+          server-password: CENTRAL_PORTAL_PASSWORD
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Verify publishing credentials
+        run: |
+          if [[ -z "${CENTRAL_PORTAL_USERNAME}" || -z "${CENTRAL_PORTAL_PASSWORD}" ]]; then
+            echo "Central Portal credentials are not configured for this workflow." >&2
+            exit 1
+          fi
+
+          if [[ -z "${MAVEN_GPG_PASSPHRASE}" ]]; then
+            echo "Maven GPG passphrase is not configured for this workflow." >&2
+            exit 1
+          fi
+
+      - name: Verify release tag exists
+        run: |
+          git fetch --tags --force
+
+          if ! git rev-parse --verify "refs/tags/${{ inputs.tag }}" >/dev/null 2>&1; then
+            echo "Release tag not found: ${{ inputs.tag }}" >&2
+            exit 1
+          fi
+
+      - name: Perform release
+        run: |
+          EXTRA_ARGS=""
+
+          if [[ "${{ inputs.dry_run }}" == "true" ]]; then
+            EXTRA_ARGS="-DdryRun=true"
+          fi
+
+          mvn -B -ntp \
+            release:perform \
+            -DconnectionUrl=scm:git:https://github.com/walokra/markdown-page-generator-plugin.git \
+            -Dtag="${{ inputs.tag }}" \
+            -Darguments="-Prelease -Dgpg.passphrase=${MAVEN_GPG_PASSPHRASE}" \
+            -Dgoals=deploy \
+            -Dresume=false \
+            ${EXTRA_ARGS}
+
+      - name: Show performed release summary
+        if: ${{ !inputs.dry_run }}
+        run: |
+          echo "Performed release for tag: ${{ inputs.tag }}"
+          echo "Artifacts were deployed through the Central Publisher Portal compatibility endpoint."
