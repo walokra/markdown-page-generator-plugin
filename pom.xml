@@ -235,7 +235,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- mvn test org.owasp:dependency-check-maven:check -->
+            <!-- mvn test org.owasp:dependency-check-maven:check
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
@@ -250,7 +250,7 @@
                 <configuration>
                     <failOnError>false</failOnError>
                 </configuration>
-            </plugin>
+            </plugin> -->
             <!-- mvn versions:display-dependency-updates -->
             <!-- mvn versions:display-plugin-updates -->
             <plugin>
