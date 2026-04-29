@@ -494,12 +494,14 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
         finalFlexmarkOptions.set(Parser.EXTENSIONS, extensions);
 
-        // StringBuilder finalOptions = new StringBuilder("final flexmark options: ");
-        // for (DataKey<?> opt : finalFlexmarkOptions.keySet()) {
-        //     finalOptions.append(opt.getName());
-        //     finalOptions.append(" ");
-        // }
-        // getLog().debug(finalOptions.toString());
+        if (getLog().isDebugEnabled()) {
+            StringBuilder finalOptions = new StringBuilder("final flexmark options: ");
+            for (DataKey<?> opt : finalFlexmarkOptions.getKeys()) {
+                finalOptions.append(opt.getName());
+                finalOptions.append(" ");
+            }
+            getLog().debug(finalOptions.toString());
+        }
 
         Parser parser = Parser.builder(finalFlexmarkOptions).build();
         HtmlRenderer renderer = HtmlRenderer.builder(finalFlexmarkOptions).build();
