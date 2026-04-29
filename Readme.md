@@ -12,7 +12,7 @@ Plugin Information:
 <plugin>
     <groupId>com.ruleoftech</groupId>
     <artifactId>markdown-page-generator-plugin</artifactId>
-    <version>2.4.3</version>
+    <version>2.5.0</version>
 </plugin>
 ```
 
@@ -139,117 +139,72 @@ Configuration options:
   Core Nodes:
 
   * AutoLink
-
   * BlockQuote
-
   * BulletList
-
   * BulletListItem
-
   * Code
-
   * Emphasis
-
   * FencedCodeBlock
-
   * Heading
-
   * Image
-
   * ImageRef
-
   * IndentedCodeBlock
-
   * Link
-
   * LinkRef
-
   * MailLink
-
   * OrderedList
-
   * OrderedList
-
   * OrderedListItem
-
   * Strikethrough
-
   * StrongEmphasis
-
   * TableBlock
-
   * TableBody
-
   * TableCaption
-
   * TableCell
-
   * TableHead
-
   * TableRow
-
   * ThematicBreak
 
 * `pegdownExtensions`: Comma separated list of constants as specified in
-  `com.vladsch.flexmark.profiles.pegdown.Extensions`. The default is `TABLES`.
+  `com.vladsch.flexmark.profile.pegdown.Extensions`. The default is `TABLES`.
 
   :information_source: [flexmark-java] has many more extensions and configuration options than
   [pegdown] in addition to extensions available in pegdown 1.6.0, the following extensions are
   available:
 
   * `SMARTS`: Beautifies `...` `. . .`, `--` and `---` to `…`, `…`, `–` and `—` respectively.
-
   * `QUOTES`: Beautifies single quotes `'`, `"`, `<<` and `>>` to `‘` `’` `‛`, `“` `”` `‟`, `«`
     and `»`
-
   * `SMARTYPANTS`: Convenience extension enabling both, `SMARTS` and `QUOTES`, at once.
-
   * `ABBREVIATIONS`: Abbreviations in the way of [PHP Markdown Extra].
-
   * `ANCHORLINKS`: Generate anchor links for headers by taking the first range of alphanumerics
     and spaces.
-
   * `HARDWRAPS`: Alternative handling of newlines, see [Github-flavoured-Markdown]
-
   * `AUTOLINKS`: Plain, undelimited autolinks the way [Github-flavoured-Markdown] implements
     them.
-
   * `TABLES`: Tables similar to [MultiMarkdown] (which is in turn like the
     [PHP Markdown Extra: tables] tables, but with colspan support).
-
   * `DEFINITIONS`: Definition lists in the way of [PHP Markdown Extra: definition list].
-
   * `FENCED_CODE_BLOCKS`: Fenced Code Blocks in the way of [PHP Markdown Extra: fenced code] or
     [Github-flavoured-Markdown].
-
   * `SUPPRESS_HTML_BLOCKS`: Suppresses the output of HTML blocks.
-
   * `SUPPRESS_INLINE_HTML`: Suppresses the output of inline HTML elements.
-
   * `WIKILINKS`: Support `[[Wiki-style links]]` with a customizable URL rendering logic.
-
   * `STRIKETHROUGH`: Support `~~strikethroughs~~` as supported in [Pandoc] and
     [Github-flavoured-Markdown].
-
   * `ATXHEADERSPACE`: Require a space between the `#` and the header title text, as per
     [Github-flavoured-Markdown]. Frees up `#` without a space to be just plain text.
-
   * `FORCELISTITEMPARA`: Wrap a list item or definition term in `<p>` tags if it contains more
     than a simple paragraph.
-
   * `RELAXEDHRULES`: allow horizontal rules without a blank line following them.
-
   * `TASKLISTITEMS`: parses bullet lists of the form `* [ ]`, `* [x]` and `* [X]` to create
     [Github-flavoured-Markdown] task list items.
-
   * `EXTANCHORLINKS`: Generate anchor links for headers using complete contents of the header.
     * Spaces and non-alphanumerics replaced by `-`, multiple dashes trimmed to one.
     * Anchor link is added as first element inside the header with empty content: `<h1><a
       name="header"></a>header</h1>`
-
   * `EXTANCHORLINKS_WRAP`: used in conjunction with above to create an anchor that wraps header
     content: `<h1><a name="header">header</a></h1>`
-
   * `TOC`: used to enable table of contents extension `[TOC]` The TOC tag has the following
     format: `[TOC style]`. `style` consists of space separated list of options:
     * `levels=levelList` where level list is a comma separated list of levels or ranges. Default
@@ -267,16 +222,13 @@ Configuration options:
     * `reversed`: flat reversed list of headings
     * `increasing`: flat, alphabetically increasing by heading text
     * `decreasing`: flat, alphabetically decreasing by heading text
-
   * `MULTI_LINE_IMAGE_URLS`: enables parsing of image urls spanning more than one line the
     format is strict `![alt text](urladdress?` must be the last non-blank segment on a line. The
     terminating `)` or `"title")` must be the first non-indented segment on the line. Everything
     in between is sucked up as part of the URL except for blank lines.
-
   * `RELAXED_STRONG_EMPHASIS_RULES`: allow Strong/Emphasis marks to start when not preceded by
     alphanumeric for `_` and as long as not surrounded by spaces for `*` instead of only when
     preceded by spaces.
-
   * `FOOTNOTES`: Support MultiMarkdown style footnotes: `[^n] for footnote reference` and `[^n]:
     Footnote text` for footnotes. Where `n` is one or more digit, letter, `-`, `_` or `.`.
     Footnotes will be put at the bottom of the page, sequentially numbered in order of
@@ -334,9 +286,7 @@ Configuration options:
     </div>
 
   * `SUBSCRIPT`: subscript extension `~subscript~`
-
   * `SUPERSCRIPT`: superscript extension `^superscript^`
-
   * `INSERTED`: inserted or underlined extension `++inserted++`
 
 * `removeMarkdownHeaders`: Remove headers on top of markdown files if exists.

@@ -44,14 +44,15 @@ import org.codehaus.plexus.util.StringUtils;
 
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.profiles.pegdown.Extensions;
-import com.vladsch.flexmark.profiles.pegdown.PegdownOptionsAdapter;
+import com.vladsch.flexmark.profile.pegdown.Extensions;
+import com.vladsch.flexmark.profile.pegdown.PegdownOptionsAdapter;
 import com.vladsch.flexmark.util.ast.Node;
-import com.vladsch.flexmark.util.builder.Extension;
+import com.vladsch.flexmark.util.misc.Extension;
 import com.vladsch.flexmark.util.data.DataKey;
+import com.vladsch.flexmark.util.data.DataKeyBase;
 import com.vladsch.flexmark.util.data.MutableDataHolder;
 import com.vladsch.flexmark.util.data.MutableDataSet;
-import com.vladsch.flexmark.util.html.Attributes;
+import com.vladsch.flexmark.util.html.MutableAttributes;
 
 /**
  * Creates a static html from markdown files.
@@ -192,7 +193,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
             int pegdownOptions = getPegdownExtensions(pegdownExtensions);
             MutableDataHolder flexmarkParserOptions = getFlexmarkParserOptions(this.flexmarkParserOptions);
             MutableDataHolder flexmarkRendererOptions = getFlexmarkRendererOptions(this.flexmarkRendererOptions);
-            final Map<String, Attributes> attributesMap = processAttributes(attributes);
+            final Map<String, MutableAttributes> attributesMap = processAttributes(attributes);
 
             getLog().info("Parse Markdown to HTML");
             processMarkdown(markdownDTOs, pegdownOptions, flexmarkParserOptions, flexmarkRendererOptions, attributesMap);
@@ -261,12 +262,12 @@ public class MdPageGeneratorMojo extends AbstractMojo {
      * @param attributeList list of attributes
      * @return map of Node class to attributable part and attributes
      */
-    private Map<String, Attributes> processAttributes(String[] attributeList) {
-        Map<String, Attributes> nodeAttributeMap = new HashMap<>();
+    private Map<String, MutableAttributes> processAttributes(String[] attributeList) {
+        Map<String, MutableAttributes> nodeAttributeMap = new HashMap<>();
 
         for (String attribute : attributeList) {
             String[] nodeAttributes = attribute.split("\\|");
-            Attributes attributes = new Attributes();
+            MutableAttributes attributes = new MutableAttributes();
             for (int i = 1; i < nodeAttributes.length; i++) {
                 String[] attributeNameValue = nodeAttributes[i].split("=", 2);
                 if (attributeNameValue.length > 1) {
@@ -468,7 +469,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
                                  int pegdownOptions,
                                  MutableDataHolder flexmarkParserOptions,
                                  MutableDataHolder flexmarkRendererOptions,
-                                 final Map<String, Attributes> attributesMap
+                                 final Map<String, MutableAttributes> attributesMap
     ) throws MojoExecutionException {
         getLog().debug("Process Markdown");
         getLog().debug("inputEncoding: '" + getInputEncoding() + "', outputEncoding: '" + getOutputEncoding() + "'");
@@ -494,12 +495,14 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
         finalFlexmarkOptions.set(Parser.EXTENSIONS, extensions);
 
-        StringBuilder finalOptions = new StringBuilder("final flexmark options: ");
-        for (DataKey<?> opt : finalFlexmarkOptions.keySet()) {
-            finalOptions.append(opt.getName());
-            finalOptions.append(" ");
+        if (getLog().isDebugEnabled()) {
+            StringBuilder finalOptions = new StringBuilder("final flexmark options: ");
+            for (DataKeyBase<?> opt : finalFlexmarkOptions.getKeys()) {
+                finalOptions.append(opt.getName());
+                finalOptions.append(" ");
+            }
+            getLog().debug(finalOptions.toString());
         }
-        getLog().debug(finalOptions.toString());
 
         Parser parser = Parser.builder(finalFlexmarkOptions).build();
         HtmlRenderer renderer = HtmlRenderer.builder(finalFlexmarkOptions).build();
