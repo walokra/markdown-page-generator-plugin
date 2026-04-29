@@ -14,13 +14,13 @@ import java.util.Set;
 public class FlexmarkLinkResolver implements LinkResolver {
     final String[] inputFileExtensions;
 
-    public FlexmarkLinkResolver(LinkResolverContext context) {
+    public FlexmarkLinkResolver(LinkResolverBasicContext context) {
         DataHolder options = context.getOptions();
         this.inputFileExtensions = options.get(PageGeneratorExtension.INPUT_FILE_EXTENSIONS).trim().split("\\s*,\\s*");
     }
 
     @Override
-    public ResolvedLink resolveLink(Node node, LinkResolverContext context, ResolvedLink link) {
+    public ResolvedLink resolveLink(Node node, LinkResolverBasicContext context, ResolvedLink link) {
         ResolvedLink result = link;
 
         for (String inputFileExtension : inputFileExtensions) {
@@ -45,14 +45,14 @@ public class FlexmarkLinkResolver implements LinkResolver {
 
     public static class Factory extends IndependentLinkResolverFactory {
         @Override
-        public Set<Class<? extends LinkResolverFactory>> getBeforeDependents() {
-            Set<Class<? extends LinkResolverFactory>> set = new HashSet<Class<? extends LinkResolverFactory>>();
+        public Set<Class<?>> getBeforeDependents() {
+            Set<Class<?>> set = new HashSet<Class<?>>();
             set.add(WikiLinkLinkResolver.Factory.class);
             return set;
         }
 
         @Override
-        public LinkResolver apply(LinkResolverContext context) {
+        public LinkResolver apply(LinkResolverBasicContext context) {
             return new FlexmarkLinkResolver(context);
         }
     }

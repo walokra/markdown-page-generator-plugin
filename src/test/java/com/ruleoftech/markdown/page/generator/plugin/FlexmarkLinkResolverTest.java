@@ -10,6 +10,7 @@ import com.vladsch.flexmark.html.renderer.NodeRendererContext;
 import com.vladsch.flexmark.html.renderer.RenderingPhase;
 import com.vladsch.flexmark.html.renderer.ResolvedLink;
 import com.vladsch.flexmark.util.html.Attributes;
+import com.vladsch.flexmark.util.html.MutableAttributes;
 import com.vladsch.flexmark.util.data.DataHolder;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 
@@ -25,12 +26,12 @@ public class FlexmarkLinkResolverTest extends BetterAbstractMojoTestCase {
         // Given
         NodeRendererContext context = new NodeRendererContext() {
             @Override
-            public Attributes extendRenderingNodeAttributes(AttributablePart part, Attributes attributes) {
+            public MutableAttributes extendRenderingNodeAttributes(AttributablePart part, Attributes attributes) {
                 return null;
             }
-            
+
             @Override
-            public Attributes extendRenderingNodeAttributes(Node node, AttributablePart part, Attributes attributes) {
+            public MutableAttributes extendRenderingNodeAttributes(Node node, AttributablePart part, Attributes attributes) {
             	return null;
             }
 
@@ -38,12 +39,12 @@ public class FlexmarkLinkResolverTest extends BetterAbstractMojoTestCase {
             public HtmlWriter getHtmlWriter() {
                 return null;
             }
-            
+
             @Override
             public NodeRendererContext getSubContext(boolean inheritIndent) {
             	return null;
             }
-            
+
             @Override
             public NodeRendererContext getDelegatedSubContext(boolean inheritIndent) {
             	return null;
