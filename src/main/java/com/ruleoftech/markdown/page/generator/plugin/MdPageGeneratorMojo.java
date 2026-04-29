@@ -49,6 +49,7 @@ import com.vladsch.flexmark.profile.pegdown.PegdownOptionsAdapter;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.misc.Extension;
 import com.vladsch.flexmark.util.data.DataKey;
+import com.vladsch.flexmark.util.data.DataKeyBase;
 import com.vladsch.flexmark.util.data.MutableDataHolder;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import com.vladsch.flexmark.util.html.MutableAttributes;
@@ -496,7 +497,7 @@ public class MdPageGeneratorMojo extends AbstractMojo {
 
         if (getLog().isDebugEnabled()) {
             StringBuilder finalOptions = new StringBuilder("final flexmark options: ");
-            for (DataKey<?> opt : finalFlexmarkOptions.getKeys()) {
+            for (DataKeyBase<?> opt : finalFlexmarkOptions.getKeys()) {
                 finalOptions.append(opt.getName());
                 finalOptions.append(" ");
             }
