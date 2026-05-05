@@ -74,17 +74,18 @@ jobs:
 
       - name: Perform release
         run: |
+          EXTRA_ARGS=""
           if [[ "${{ inputs.dry_run }}" == "true" ]]; then
-            mvn -B -ntp \
-              -Prelease \
-              -Dgpg.passphrase="${MAVEN_GPG_PASSPHRASE}" \
-              verify
-          else
-            mvn -B -ntp \
-              -Prelease \
-              -Dgpg.passphrase="${MAVEN_GPG_PASSPHRASE}" \
-              deploy
+            EXTRA_ARGS="-DdryRun=true"
           fi
+
+          mvn -B -ntp \
+            release:perform \
+            -Dtag="${{ inputs.tag }}" \
+            -Darguments="-Prelease -Dgpg.passphrase=${MAVEN_GPG_PASSPHRASE}" \
+            -Dgoals=deploy \
+            -Dresume=false \
+            ${EXTRA_ARGS}
 
       - name: Show performed release summary
         if: ${{ !inputs.dry_run }}
