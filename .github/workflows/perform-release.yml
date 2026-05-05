@@ -68,22 +68,23 @@ jobs:
             exit 1
           fi
 
+      - name: Checkout release tag
+        run: |
+          git checkout --detach "refs/tags/${{ inputs.tag }}"
+
       - name: Perform release
         run: |
-          EXTRA_ARGS=""
-
           if [[ "${{ inputs.dry_run }}" == "true" ]]; then
-            EXTRA_ARGS="-DdryRun=true"
+            mvn -B -ntp \
+              -Prelease \
+              -Dgpg.passphrase="${MAVEN_GPG_PASSPHRASE}" \
+              verify
+          else
+            mvn -B -ntp \
+              -Prelease \
+              -Dgpg.passphrase="${MAVEN_GPG_PASSPHRASE}" \
+              deploy
           fi
-
-          mvn -B -ntp \
-            release:perform \
-            -Dtag="${{ inputs.tag }}" \
-            -DconnectionUrl="scm:git:https://github.com/${{ github.repository }}.git" \
-            -Darguments="-Prelease -Dgpg.passphrase=${MAVEN_GPG_PASSPHRASE}" \
-            -Dgoals=deploy \
-            -Dresume=false \
-            ${EXTRA_ARGS}
 
       - name: Show performed release summary
         if: ${{ !inputs.dry_run }}
