@@ -1,4 +1,4 @@
-name: Prepare And Perform Release
+name: Prepare Release
 
 on:
   workflow_dispatch:
@@ -82,11 +82,10 @@ jobs:
           TEMP_GNUPG_DIR="$(mktemp -d)"
           chmod 700 "${TEMP_GNUPG_DIR}"
 
-          if ! gpg --batch --homedir "${TEMP_GNUPG_DIR}" --keyserver hkps://keyserver.ubuntu.com --recv-keys "${SIGNING_KEY_FINGERPRINT}" >/dev/null 2>&1; then
+          if ! gpg --batch --homedir "${TEMP_GNUPG_DIR}" --keyserver hkp://keys.openpgp.org --recv-keys "${SIGNING_KEY_FINGERPRINT}" >/dev/null 2>&1; then
             rm -rf "${TEMP_GNUPG_DIR}"
             echo "Could not find the signing key fingerprint on supported public keyservers." >&2
             echo "Upload your public key and retry:" >&2
-            echo "gpg --keyserver keyserver.ubuntu.com --send-keys ${SIGNING_KEY_FINGERPRINT}" >&2
             echo "gpg --keyserver keys.openpgp.org --send-keys ${SIGNING_KEY_FINGERPRINT}" >&2
             exit 1
           fi
