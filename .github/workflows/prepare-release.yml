@@ -31,10 +31,6 @@ concurrency:
 jobs:
   prepare-and-perform-release:
     runs-on: ubuntu-latest
-    env:
-      CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
-      CENTRAL_PORTAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
-      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
 
     steps:
       - name: Checkout code
@@ -48,49 +44,6 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
           cache: maven
-          server-id: central
-          server-username: CENTRAL_PORTAL_USERNAME
-          server-password: CENTRAL_PORTAL_PASSWORD
-          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
-          gpg-passphrase: MAVEN_GPG_PASSPHRASE
-
-      - name: Verify publishing credentials
-        if: ${{ !inputs.dry_run }}
-        run: |
-          if [[ -z "${CENTRAL_PORTAL_USERNAME}" || -z "${CENTRAL_PORTAL_PASSWORD}" ]]; then
-            echo "Central Portal credentials are not configured for this workflow." >&2
-            exit 1
-          fi
-
-          if [[ -z "${MAVEN_GPG_PASSPHRASE}" || -z "${{ secrets.MAVEN_GPG_PRIVATE_KEY }}" ]]; then
-            echo "Maven GPG private key or passphrase is not configured for this workflow." >&2
-            exit 1
-          fi
-
-      - name: Verify signing key is published
-        if: ${{ !inputs.dry_run }}
-        run: |
-          SIGNING_KEY_FINGERPRINT="$(gpg --batch --list-secret-keys --with-colons | awk -F: '/^fpr:/ { print $10; exit }')"
-
-          if [[ -z "${SIGNING_KEY_FINGERPRINT}" ]]; then
-            echo "No signing key fingerprint was found after importing MAVEN_GPG_PRIVATE_KEY." >&2
-            exit 1
-          fi
-
-          echo "Using signing key fingerprint: ${SIGNING_KEY_FINGERPRINT}"
-
-          TEMP_GNUPG_DIR="$(mktemp -d)"
-          chmod 700 "${TEMP_GNUPG_DIR}"
-
-          if ! gpg --batch --homedir "${TEMP_GNUPG_DIR}" --keyserver hkp://keys.openpgp.org --recv-keys "${SIGNING_KEY_FINGERPRINT}" >/dev/null 2>&1; then
-            rm -rf "${TEMP_GNUPG_DIR}"
-            echo "Could not find the signing key fingerprint on supported public keyservers." >&2
-            echo "Upload your public key and retry:" >&2
-            echo "gpg --keyserver keys.openpgp.org --send-keys ${SIGNING_KEY_FINGERPRINT}" >&2
-            exit 1
-          fi
-
-          rm -rf "${TEMP_GNUPG_DIR}"
 
       - name: Configure Git identity
         run: |
@@ -158,23 +111,10 @@ jobs:
             exit 1
           fi
 
-      - name: Checkout prepared release tag
-        if: ${{ !inputs.dry_run }}
-        run: |
-          git checkout --detach "refs/tags/${RELEASE_TAG}"
-
-      - name: Perform release deployment
-        if: ${{ !inputs.dry_run }}
-        run: |
-          mvn -B -ntp \
-            -Prelease \
-            -Dgpg.passphrase="${MAVEN_GPG_PASSPHRASE}" \
-            deploy
-
       - name: Show prepared release summary
         if: ${{ !inputs.dry_run }}
         run: |
           echo "Release version: ${{ inputs.release_version }}"
           echo "Next development version: ${{ inputs.development_version }}"
           echo "Tag: ${RELEASE_TAG}"
-          echo "Artifacts were deployed through the Central Publisher Portal compatibility endpoint."
+          echo "Run perform-release.yml to deploy the signed release artifacts to Central Publisher Portal."
