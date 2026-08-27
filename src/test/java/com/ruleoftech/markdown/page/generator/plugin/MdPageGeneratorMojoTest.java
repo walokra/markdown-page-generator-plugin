@@ -200,6 +200,8 @@ public class MdPageGeneratorMojoTest extends BetterAbstractMojoTestCase {
         String markDown = FileUtils.readFileToString(generatedMarkdown, "ISO-8859-15");
         assertNotNull(markDown);
         assertTrue(markDown.contains("<ol start=\"3\">"));
+        assertTrue(markDown.contains("<li>Another item\n<ul>\n<li>Unordered sub-list.</li>\n</ul>\n</li>"));
+        assertTrue(markDown.contains("<li>Actual numbers don't matter, just that it's a number\n<ol>\n<li>Ordered sub-list</li>\n</ol>\n</li>"));
     }
 
     @Test
