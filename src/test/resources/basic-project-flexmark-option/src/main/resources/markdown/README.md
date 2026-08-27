@@ -34,3 +34,11 @@ This is a link to [itself](README.md)
 * Unordered list can use asterisks
 - Or minuses
 + Or pluses
+
+- Nested lists
+  - are delimited by lines with leading 4 spaces
+      - sub-list item 1
+      - sub-list item 2
+          - sub-sub-list item 1
+          - sub-sub-list item 2
+- This differs how CommonMark specifies sub-lists
