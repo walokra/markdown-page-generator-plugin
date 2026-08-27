@@ -6,6 +6,9 @@ release.properties
 .classpath
 .project
 
+# VS Code files
+.vscode/
+
 # IDEA files
 .idea
 *.iml
