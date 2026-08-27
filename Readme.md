@@ -47,6 +47,8 @@ Default configuration which can be overridden:
 - `inputDirectory`: `${project.basedir}/src/main/resources/markdown/`
 - `outputDirectory`: `${project.build.directory}/html/`
 
+Note for Windows users: You might need to explicitly declare inputEncoding as UTF-8 if your `${project.build.sourceEncoding}` is not set to UTF-8. See [Configuration](README.md#configuration) options below for an example.
+
 Configuration options:
 
 - `applyFiltering`: apply variables substitution if `true`. Default `false`.
